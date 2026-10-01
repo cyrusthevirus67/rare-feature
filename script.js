@@ -21,27 +21,6 @@ const setMenu = (open) => {
 toggle.addEventListener("click", () => setMenu(menu.hidden));
 menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
 
-// Who-we-help tabs
-const tabs = [...document.querySelectorAll(".tab")];
-const selectTab = (tab) => {
-  tabs.forEach((t) => {
-    const on = t === tab;
-    t.classList.toggle("is-active", on);
-    t.setAttribute("aria-selected", String(on));
-    t.tabIndex = on ? 0 : -1;
-    document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
-  });
-};
-tabs.forEach((tab, i) => {
-  tab.addEventListener("click", () => selectTab(tab));
-  tab.addEventListener("keydown", (e) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-    const next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
-    selectTab(next);
-    next.focus();
-  });
-});
-
 // Scroll reveal
 const io = new IntersectionObserver(
   (entries) => entries.forEach((e) => {
