@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://images.unsplash.com">
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="https://images.unsplash.com/photo-1611784728558-6c7d9b409cdf?auto=format&fit=crop&w=2000&q=70">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -28,10 +28,11 @@
         <a href="#services">Services</a>
         <a href="#who">Who we help</a>
         <a href="#process">Process</a>
-        <a href="#work-together">Work with us</a>
+        <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
       </nav>
-      <a href="#contact" class="btn btn--red btn--sm nav__cta">Book a call</a>
+      <a href="client.html" class="nav__login">Client login</a>
+      <a href="#contact" class="btn btn--red btn--sm nav__cta" data-plan="audit">Free audit</a>
       <button class="nav__toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
         <span></span><span></span>
       </button>
@@ -40,9 +41,10 @@
       <a href="#services">Services</a>
       <a href="#who">Who we help</a>
       <a href="#process">Process</a>
-      <a href="#work-together">Work with us</a>
+      <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
-      <a href="#contact" class="btn btn--red">Book a free call</a>
+      <a href="client.html">Client login</a>
+      <a href="#contact" class="btn btn--red" data-plan="audit">Get a free audit</a>
     </div>
   </header>
 
@@ -63,8 +65,8 @@
         <div class="hero__foot">
           <p class="hero__lede">We help businesses and content creators grow on social — with the strategy, content, and coaching that turn views into followers and followers into customers.</p>
           <div class="hero__actions">
-            <a href="#contact" class="btn btn--red">Book a free call <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
-            <a href="#services" class="btn btn--glass">What we do</a>
+            <a href="#contact" class="btn btn--red" data-plan="audit">Get a free audit <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+            <a href="#pricing" class="btn btn--glass">See pricing</a>
           </div>
         </div>
       </div>
@@ -151,7 +153,7 @@
                 <li>No time or system for content</li>
                 <li>Followers who never buy</li>
               </ul>
-              <a href="#contact" class="btn btn--red btn--sm">Grow my business</a>
+              <a href="#pricing" class="btn btn--red btn--sm">See packages</a>
             </div>
           </article>
           <article class="who__card reveal">
@@ -198,47 +200,97 @@
           <h2 class="display">The process</h2>
         </div>
         <ol class="steps">
-          <li class="step reveal"><span class="step__n">01</span><h3>Free call</h3><p>We learn about you, your audience, and where you want to go.</p></li>
-          <li class="step reveal"><span class="step__n">02</span><h3>Audit &amp; plan</h3><p>We break down your accounts and build a custom growth plan.</p></li>
-          <li class="step reveal"><span class="step__n">03</span><h3>Create &amp; launch</h3><p>Content, posting rhythm, and optimization — put into action.</p></li>
-          <li class="step reveal"><span class="step__n">04</span><h3>Review &amp; scale</h3><p>We double down on what works and cut what doesn’t.</p></li>
+          <li class="step reveal"><span class="step__n">01</span><h3>Free audit</h3><p>We review your page on video and send you 3 quick wins — free.</p></li>
+          <li class="step reveal"><span class="step__n">02</span><h3>Plan</h3><p>A full audit, a 90-day content plan, and a strategy call.</p></li>
+          <li class="step reveal"><span class="step__n">03</span><h3>Film &amp; post</h3><p>We film, edit, caption, and schedule your content every month.</p></li>
+          <li class="step reveal"><span class="step__n">04</span><h3>Report &amp; scale</h3><p>Monthly reports show what’s working, and we double down on it.</p></li>
         </ol>
       </div>
     </section>
 
-    <!-- WORK WITH US -->
-    <section class="section section--panel" id="work-together">
+    <!-- PRICING -->
+    <section class="section section--panel" id="pricing">
       <div class="wrap">
         <div class="head head--row">
           <div>
-            <p class="label">Work with us</p>
-            <h2 class="display">Pick your<br>starting point.</h2>
+            <p class="label">Pricing</p>
+            <h2 class="display">Simple,<br>upfront pricing.</h2>
           </div>
-          <p class="head__sub">Every engagement starts with a free call so we can recommend the right fit — no pressure, no long contracts to start.</p>
+          <p class="head__sub">No hidden fees and no guessing. Start free, start with a plan, or go straight to done-for-you content every month.</p>
         </div>
+
+        <div class="audit reveal">
+          <div>
+            <p class="audit__k">Start here · Free</p>
+            <h3>Free Instagram audit</h3>
+            <p>A 3–5 minute video review of your page with 3 quick wins you can use right away.</p>
+          </div>
+          <a href="#contact" class="btn btn--red" data-plan="audit">Get my free audit <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        </div>
+
         <div class="plans">
           <article class="plan reveal">
-            <p class="plan__k">One-time</p>
-            <h3>Strategy session</h3>
-            <p>A deep-dive on your accounts with direct, actionable fixes you can use immediately.</p>
-            <ul><li>Account &amp; content review</li><li>Priority action list</li><li>Live Q&amp;A</li></ul>
-            <a href="#contact" class="btn btn--line btn--block">Book a session</a>
+            <p class="plan__k">Starter</p>
+            <p class="price"><span>$997</span>/mo</p>
+            <p class="plan__d">Consistent, professional content without lifting a finger.</p>
+            <ul>
+              <li>1 filming session a month</li>
+              <li>8 short videos</li>
+              <li>Instagram + Facebook</li>
+              <li>Captions &amp; scheduling</li>
+              <li>Monthly report</li>
+            </ul>
+            <a href="#contact" class="btn btn--line btn--block" data-plan="starter">Choose Starter</a>
           </article>
           <article class="plan plan--hot reveal">
-            <p class="plan__k">Most popular</p>
-            <h3>Growth plan</h3>
-            <p>A full audit plus a custom 90-day roadmap: platforms, content pillars, posting rhythm, and the numbers to watch.</p>
-            <ul><li>Complete account audit</li><li>90-day content roadmap</li><li>Follow-up strategy calls</li></ul>
-            <a href="#contact" class="btn btn--red btn--block">Start my growth plan</a>
+            <p class="plan__badge">Most popular</p>
+            <p class="plan__k">Growth</p>
+            <p class="price"><span>$1,497</span>/mo</p>
+            <p class="plan__d">More content, more platforms, and hands-on engagement.</p>
+            <ul>
+              <li>2 filming sessions a month</li>
+              <li>12 short videos</li>
+              <li>Instagram + Facebook + TikTok</li>
+              <li>Captions &amp; scheduling</li>
+              <li>Light engagement</li>
+              <li>Monthly report</li>
+            </ul>
+            <a href="#contact" class="btn btn--red btn--block" data-plan="growth">Choose Growth</a>
           </article>
           <article class="plan reveal">
-            <p class="plan__k">Ongoing</p>
-            <h3>Partnership</h3>
-            <p>A dedicated partner for strategy, content direction, and growth — month after month.</p>
-            <ul><li>Monthly strategy &amp; reporting</li><li>Content direction</li><li>Priority access</li></ul>
-            <a href="#contact" class="btn btn--line btn--block">Let’s talk</a>
+            <p class="plan__k">Premium</p>
+            <p class="price"><span>$2,497</span>/mo</p>
+            <p class="plan__d">Full-scale content and paid ads, handled end to end.</p>
+            <ul>
+              <li>Weekly filming</li>
+              <li>16–20 short videos</li>
+              <li>All platforms, incl. YouTube Shorts</li>
+              <li>Captions, scheduling &amp; engagement</li>
+              <li>Ad management <small>(ad spend separate)</small></li>
+              <li>Monthly report</li>
+            </ul>
+            <a href="#contact" class="btn btn--line btn--block" data-plan="premium">Choose Premium</a>
           </article>
         </div>
+
+        <div class="onetime reveal">
+          <div class="onetime__main">
+            <p class="plan__k">One-time · Not ready for monthly?</p>
+            <h3>Growth Plan</h3>
+            <p>A full audit of your accounts, a 90-day content plan, and a 60-minute strategy call. Yours to run with.</p>
+            <p class="onetime__note">Sign up for a monthly package within 30 days and the full $497 is credited to your first month.</p>
+          </div>
+          <div class="onetime__buy">
+            <p class="price"><span>$497</span> one-time</p>
+            <a href="#contact" class="btn btn--line btn--block" data-plan="growth-plan">Get the Growth Plan</a>
+          </div>
+        </div>
+
+        <ul class="fineprint">
+          <li>Monthly packages have a 3-month minimum, then continue month to month.</li>
+          <li>Billed monthly in advance by automatic payment.</li>
+          <li>See, manage, or cancel your plan in the <a href="client.html">client portal</a>.</li>
+        </ul>
       </div>
     </section>
 
@@ -261,15 +313,31 @@
           </details>
           <details>
             <summary>Do you run my accounts or coach me?</summary>
-            <p>Both. Some clients want hands-on help creating content; others want a clear plan and coaching so they can run it themselves. We’ll recommend the right fit on your call.</p>
+            <p>Both. Some clients want hands-on help creating content; others want a clear plan and coaching so they can run it themselves. We’ll recommend the right fit for you.</p>
           </details>
           <details>
             <summary>How fast will I see results?</summary>
             <p>Every account is different, and anyone promising overnight growth isn’t being straight with you. What we promise is a clear strategy, consistent execution, and honest reporting.</p>
           </details>
           <details>
-            <summary>What happens on the free call?</summary>
-            <p>We talk through your goals, look at your current accounts, and give you honest feedback on your biggest opportunities — no obligation.</p>
+            <summary>What do I get with the free audit?</summary>
+            <p>A 3–5 minute video where we walk through your Instagram page and give you 3 quick wins you can act on right away. It’s free, with no obligation.</p>
+          </details>
+          <details>
+            <summary>Is there a contract?</summary>
+            <p>Monthly packages have a 3-month minimum, because real results take time to build. After that, your plan continues month to month.</p>
+          </details>
+          <details>
+            <summary>How do I manage or cancel my plan?</summary>
+            <p>Sign in to the <a href="client.html">client portal</a> to see your plan, update your card, download invoices, or cancel. Cancellations take effect at the end of your current billing period once the 3-month minimum is complete.</p>
+          </details>
+          <details>
+            <summary>Is ad spend included in Premium?</summary>
+            <p>Ad management is included; the ad budget itself is paid separately, directly to the platform. We’ll recommend a budget that fits your goals.</p>
+          </details>
+          <details>
+            <summary>Can the Growth Plan count toward a monthly package?</summary>
+            <p>Yes. If you sign up for a monthly package within 30 days of buying the Growth Plan, the full $497 is credited toward your first month.</p>
           </details>
         </div>
       </div>
@@ -284,7 +352,7 @@
         <div class="contact__copy">
           <p class="label">Let’s talk</p>
           <h2 class="display display--xl">Ready to get <em>featured?</em></h2>
-          <p class="head__sub">Tell us about yourself and we’ll reach out to set up your free call.</p>
+          <p class="head__sub">Request your free audit or ask about a package. Tell us a little about yourself and we’ll be in touch.</p>
           <a class="contact__mail" href="mailto:cyrus@rarefeature.com">cyrus@rarefeature.com <span aria-hidden="true">↗</span></a>
         </div>
         <form class="form" id="contact-form" novalidate>
@@ -297,9 +365,21 @@
             <label class="chip"><input type="radio" name="type" value="Business" checked><span>Business</span></label>
             <label class="chip"><input type="radio" name="type" value="Content creator"><span>Content creator</span></label>
           </fieldset>
-          <label>Social handle or website <span class="opt">(optional)</span><input name="handle" type="text" placeholder="@yourhandle"></label>
-          <label>What do you want help with?<textarea name="message" rows="4" required></textarea></label>
-          <button type="submit" class="btn btn--red btn--block">Book my free call <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+          <div class="form__row">
+            <label>Instagram handle or website<input name="handle" type="text" placeholder="@yourhandle"></label>
+            <label>I’m interested in
+              <select name="interest" id="interest">
+                <option value="Free Instagram audit">Free Instagram audit</option>
+                <option value="Growth Plan ($497 one-time)">Growth Plan — $497 one-time</option>
+                <option value="Starter ($997/mo)">Starter — $997/mo</option>
+                <option value="Growth ($1,497/mo)">Growth — $1,497/mo</option>
+                <option value="Premium ($2,497/mo)">Premium — $2,497/mo</option>
+                <option value="Not sure yet">Not sure yet</option>
+              </select>
+            </label>
+          </div>
+          <label>Anything we should know? <span class="opt">(optional)</span><textarea name="message" rows="3"></textarea></label>
+          <button type="submit" class="btn btn--red btn--block">Send my request <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
           <p class="form__status" role="status" aria-live="polite"></p>
         </form>
       </div>
@@ -311,22 +391,24 @@
       <div class="footer__top">
         <p>Social media growth &amp; consulting<br>for businesses and creators.</p>
         <nav aria-label="Footer">
-          <a href="#services">Services</a><a href="#who">Who we help</a><a href="#process">Process</a><a href="#work-together">Work with us</a><a href="#faq">FAQ</a>
+          <a href="#services">Services</a><a href="#who">Who we help</a><a href="#process">Process</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
         </nav>
         <div>
           <a href="mailto:cyrus@rarefeature.com">cyrus@rarefeature.com</a>
-          <a href="#contact">Book a free call</a>
+          <a href="#contact" data-plan="audit">Get a free audit</a>
+          <a href="client.html">Client login</a>
         </div>
       </div>
       <p class="footer__word" aria-hidden="true">RARE FEATURE</p>
       <div class="footer__bottom">
         <p>© <span id="year"></span> Rare Feature</p>
-        <p>Photography via <a href="https://unsplash.com" rel="noopener">Unsplash</a></p>
+        <p><a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · Photography via <a href="https://unsplash.com" rel="noopener">Unsplash</a></p>
         <a href="#top">Back to top ↑</a>
       </div>
     </div>
   </footer>
 
-  <script src="script.js?v=6"></script>
+  <script src="config.js?v=7"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>

@@ -1,10 +1,9 @@
-// Set to a form service URL (e.g. Formspree) to receive submissions; empty falls back to mailto.
-const FORM_ENDPOINT = "";
-const CONTACT_EMAIL = "cyrus@rarefeature.com";
+const CONFIG = window.RF_CONFIG || { checkout: {}, portal: "", formEndpoint: "", email: "cyrus@rarefeature.com" };
 
-document.getElementById("year").textContent = new Date().getFullYear();
+const year = document.getElementById("year");
+if (year) year.textContent = new Date().getFullYear();
 
-// Sticky nav border
+// Sticky nav background
 const nav = document.querySelector(".nav");
 const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 40);
 onScroll();
@@ -21,6 +20,37 @@ const setMenu = (open) => {
 };
 toggle.addEventListener("click", () => setMenu(menu.hidden));
 menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+
+// Package buttons: go to Stripe checkout when a link is configured, otherwise pre-fill the contact form
+const INTEREST = {
+  audit: "Free Instagram audit",
+  "growth-plan": "Growth Plan ($497 one-time)",
+  starter: "Starter ($997/mo)",
+  growth: "Growth ($1,497/mo)",
+  premium: "Premium ($2,497/mo)",
+};
+const interest = document.getElementById("interest");
+document.querySelectorAll("[data-plan]").forEach((el) => {
+  const plan = el.dataset.plan;
+  const link = CONFIG.checkout[plan];
+  if (link) { el.href = link; return; }
+  el.addEventListener("click", () => { if (interest) interest.value = INTEREST[plan]; });
+});
+const wanted = new URLSearchParams(location.search).get("plan");
+if (interest && INTEREST[wanted]) interest.value = INTEREST[wanted];
+
+// Client portal sign-in button
+const portalBtn = document.getElementById("portal-btn");
+if (portalBtn) {
+  if (CONFIG.portal) {
+    portalBtn.href = CONFIG.portal;
+  } else {
+    portalBtn.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Help with my plan")}`;
+    portalBtn.querySelector("span").textContent = "Email us about your plan";
+    document.getElementById("portal-note").hidden = false;
+    document.getElementById("portal-how").hidden = true;
+  }
+}
 
 // Hero REC timecode
 const tc = document.getElementById("timecode");
@@ -62,7 +92,7 @@ const io = new IntersectionObserver(
   (entries) => entries.forEach((e) => {
     if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
   }),
-  { threshold: 0.15 }
+  { threshold: 0.12 }
 );
 document.querySelectorAll(".reveal").forEach((el, i) => {
   el.style.transitionDelay = `${(i % 4) * 80}ms`;
@@ -71,46 +101,48 @@ document.querySelectorAll(".reveal").forEach((el, i) => {
 
 // Contact form
 const form = document.getElementById("contact-form");
-const status = form.querySelector(".form__status");
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  status.classList.remove("is-error");
-  let valid = true;
-  form.querySelectorAll("[required]").forEach((field) => {
-    const ok = field.value.trim() && field.checkValidity();
-    field.classList.toggle("is-invalid", !ok);
-    if (!ok) valid = false;
-  });
-  if (!valid) {
-    status.textContent = "Please fill in your name, a valid email, and a short message.";
-    status.classList.add("is-error");
-    return;
-  }
-
-  const data = Object.fromEntries(new FormData(form));
-  if (!FORM_ENDPOINT) {
-    const body = `Name: ${data.name}\nEmail: ${data.email}\nI am a: ${data.type}\nHandle/site: ${data.handle || "-"}\n\n${data.message}`;
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Free call request — " + data.name)}&body=${encodeURIComponent(body)}`;
-    status.textContent = "Opening your email app to send your request…";
-    return;
-  }
-
-  const btn = form.querySelector("button[type=submit]");
-  btn.disabled = true;
-  status.textContent = "Sending…";
-  try {
-    const res = await fetch(FORM_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify(data),
+if (form) {
+  const status = form.querySelector(".form__status");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    status.classList.remove("is-error");
+    let valid = true;
+    form.querySelectorAll("[required]").forEach((field) => {
+      const ok = field.value.trim() && field.checkValidity();
+      field.classList.toggle("is-invalid", !ok);
+      if (!ok) valid = false;
     });
-    if (!res.ok) throw new Error();
-    form.reset();
-    status.textContent = "Thanks! We'll reach out soon to set up your free call.";
-  } catch {
-    status.textContent = `Something went wrong. Email us directly at ${CONTACT_EMAIL}.`;
-    status.classList.add("is-error");
-  } finally {
-    btn.disabled = false;
-  }
-});
+    if (!valid) {
+      status.textContent = "Please add your name and a valid email.";
+      status.classList.add("is-error");
+      return;
+    }
+
+    const data = Object.fromEntries(new FormData(form));
+    if (!CONFIG.formEndpoint) {
+      const body = `Name: ${data.name}\nEmail: ${data.email}\nI am a: ${data.type}\nHandle/site: ${data.handle || "-"}\nInterested in: ${data.interest}\n\n${data.message || ""}`;
+      window.location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(`${data.interest} — ${data.name}`)}&body=${encodeURIComponent(body)}`;
+      status.textContent = "Opening your email app to send your request…";
+      return;
+    }
+
+    const btn = form.querySelector("button[type=submit]");
+    btn.disabled = true;
+    status.textContent = "Sending…";
+    try {
+      const res = await fetch(CONFIG.formEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error();
+      form.reset();
+      status.textContent = "Thanks! We'll be in touch shortly.";
+    } catch {
+      status.textContent = `Something went wrong. Email us directly at ${CONFIG.email}.`;
+      status.classList.add("is-error");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
