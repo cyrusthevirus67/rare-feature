@@ -14,7 +14,7 @@ window.RF_CONFIG = {
   portal: "",
   // Supabase project for the client portal (Supabase → Project Settings → API).
   // The anon key is designed to be public; never paste the service_role key here.
-  supabase: { url: "", anonKey: "" },
+  supabase: { url: "https://hjvezrxvrshdlprnalin.supabase.co", anonKey: "sb_publishable_KHYN133iCCSZ8buwdY2FiA_Yoxgr7Ys" },
   // Optional form service URL (e.g. Formspree) so requests arrive without opening an email app.
   formEndpoint: "",
   email: "cyrus@rarefeature.com",
