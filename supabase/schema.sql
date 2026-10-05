@@ -160,5 +160,33 @@ create policy "anyone can submit a lead" on public.leads for insert to anon, aut
 drop policy if exists "admin manages leads" on public.leads;
 create policy "admin manages leads" on public.leads for all using (public.is_admin()) with check (public.is_admin());
 
+-- Automation: Stripe purchases create portals (supabase/functions/stripe-webhook) and
+-- new leads / client requests email the owner (supabase/functions/notify).
+alter table public.client_plans add column if not exists stripe_customer_id text;
+alter table public.client_plans add column if not exists stripe_subscription_id text;
+alter table public.client_plans add column if not exists stripe_session_id text;
+alter table public.leads add column if not exists notified_at timestamptz;
+alter table public.requests add column if not exists notified_at timestamptz;
+
+create extension if not exists pg_net;
+
+create or replace function public.ping_notify() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  perform net.http_post(
+    url := 'https://hjvezrxvrshdlprnalin.supabase.co/functions/v1/notify',
+    body := '{}'::jsonb,
+    headers := '{"Content-Type": "application/json"}'::jsonb
+  );
+  return new;
+exception when others then
+  return new; -- never block a lead or request because a notification failed
+end;
+$$;
+drop trigger if exists leads_notify on public.leads;
+create trigger leads_notify after insert on public.leads for each row execute function public.ping_notify();
+drop trigger if exists requests_notify on public.requests;
+create trigger requests_notify after insert on public.requests for each row execute function public.ping_notify();
+
 -- To make another person an admin later:
 --   update public.profiles set is_admin = true where email = 'someone@example.com';

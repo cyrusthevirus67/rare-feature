@@ -39,3 +39,16 @@ when you process the request.
   clients, add your own email sender under Authentication → SMTP.
 - Clients can only ever read their own data; this is enforced in the database (row-level security),
   not just in the page.
+
+## Automation
+
+- `supabase/functions/stripe-webhook` — Stripe calls this after a payment. It creates the client's login,
+  assigns the plan they bought, keeps the next billing date current, and marks plans cancelled when the
+  subscription ends in Stripe. Needs the secret `STRIPE_WEBHOOK_SECRET` (the signing secret of the Stripe
+  webhook endpoint that points at it).
+- `supabase/functions/notify` — emails the owner about new website leads and new client requests. A database
+  trigger calls it after each insert.
+- Both send email through Resend and need the secret `RESEND_API_KEY`. Without it, everything still works
+  but no emails are sent. Optional secrets: `OWNER_EMAIL` (default cyrus@rareft.com) and `EMAIL_FROM`.
+- Both functions must be deployed with "Verify JWT" turned off (Stripe and the database trigger call them
+  without a Supabase login).
