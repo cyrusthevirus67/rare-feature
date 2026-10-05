@@ -78,7 +78,10 @@ $$;
 create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  insert into public.profiles (id, email) values (new.id, new.email) on conflict (id) do nothing;
+  -- The owner's email becomes the admin automatically on first sign-in.
+  insert into public.profiles (id, email, is_admin)
+  values (new.id, new.email, lower(new.email) = 'cyrus@rareft.com')
+  on conflict (id) do nothing;
   return new;
 end;
 $$;
@@ -139,5 +142,5 @@ drop policy if exists "client creates own requests" on public.requests;
 create policy "client creates own requests" on public.requests for insert
   with check (client_id = auth.uid() and kind in ('support', 'change') and status = 'open');
 
--- After you sign in to the portal once with your own email, make yourself the admin:
---   update public.profiles set is_admin = true where email = 'cyrus@rarefeature.com';
+-- To make another person an admin later:
+--   update public.profiles set is_admin = true where email = 'someone@example.com';

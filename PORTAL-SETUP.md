@@ -14,8 +14,8 @@ everything with sample data at `portal.html?demo` and `admin.html?demo`.
 4. **Copy two values** from Project Settings → API into `config.js` under `supabase`:
    - Project URL → `url`
    - `anon` `public` key → `anonKey` (this one is safe to publish; never use the `service_role` key)
-5. **Make yourself the admin:** sign in once at `rarefeature.com/client.html` with your email, then run in the SQL Editor:
-   `update public.profiles set is_admin = true where email = 'cyrus@rarefeature.com';`
+5. **Admin:** `cyrus@rareft.com` becomes the admin automatically the first time it signs in at
+   `rarefeature.com/client.html`.
 
 ## Day to day
 
