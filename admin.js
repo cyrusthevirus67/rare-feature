@@ -45,13 +45,14 @@
     },
   };
 
-  let clients = [], plans = {}, openReqs = [], current = null, tab = "plan", rows = [], editing = null;
+  let clients = [], plans = {}, openReqs = [], leads = [], mode = "clients", current = null, tab = "plan", rows = [], editing = null;
 
   const loadClients = async () => {
     clients = await api.clients();
     const all = await Promise.all(clients.map((c) => api.plan(c.id)));
     plans = Object.fromEntries(clients.map((c, i) => [c.id, all[i]]));
     openReqs = (await api.list("requests")).filter((r) => r.status !== "done");
+    leads = await api.list("leads");
     if (!current && clients.length) current = clients[0].id;
   };
   const loadTab = async () => { rows = TABLES[tab] ? await api.list(tab, current) : []; editing = null; };
@@ -115,11 +116,28 @@
     return form + list;
   };
 
+  const leadsView = () => leads.length ? `<ul class="list">${leads.map((l) => `<li class="item${l.status === "new" ? " item--review" : ""}">
+      <div class="item__main"><b>${esc(l.name)} · <a href="mailto:${esc(l.email)}">${esc(l.email)}</a></b>
+        <span>${esc([l.type, l.interest, l.handle].filter(Boolean).join(" · "))} · ${esc(fmtDate(l.created_at))}</span>${l.message ? `<p class="note">${esc(l.message)}</p>` : ""}</div>
+      <div class="item__side">${badge(l.status)}
+        ${l.status === "new" ? `<button class="btn btn--line btn--xs" data-lead="${esc(l.id)}" data-status="contacted">Mark contacted</button>` : ""}
+        ${l.status !== "closed" ? `<button class="btn btn--line btn--xs" data-lead="${esc(l.id)}" data-status="closed">Close</button>` : ""}
+        <button class="btn btn--line btn--xs btn--danger" data-lead="${esc(l.id)}" data-status="delete">Delete</button></div></li>`).join("")}</ul>`
+    : `<div class="empty"><h2>No leads yet</h2><p>Requests from the website’s contact form appear here.</p></div>`;
+
   const render = () => {
+    const newLeads = leads.filter((l) => l.status === "new").length;
+    const modeTabs = `<div class="tabs tabs--mode"><button data-mode="clients" class="${mode === "clients" ? "is-on" : ""}">Clients (${clients.length})</button>
+      <button data-mode="leads" class="${mode === "leads" ? "is-on" : ""}">Leads${newLeads ? ` · ${newLeads} new` : ""}</button></div>`;
+    if (mode === "leads") {
+      view.innerHTML = `<header class="vhead"><p class="vhead__k">Admin</p><h1>Leads</h1><p>Free-audit and package requests sent through the website. Reply by email, then mark them contacted.</p></header>${modeTabs}${leadsView()}`;
+      return;
+    }
     const c = clients.find((x) => x.id === current);
     const tabs = [["plan", "Plan"], ...Object.entries(TABLES).map(([k, t]) => [k, t.label]), ["details", "Details"]];
     view.innerHTML = `<header class="vhead"><p class="vhead__k">Admin</p><h1>Clients</h1>
         <p>${clients.length} ${clients.length === 1 ? "person has" : "people have"} signed in. ${openReqs.length ? `<b>${openReqs.length} open request${openReqs.length > 1 ? "s" : ""}.</b>` : "No open requests."}</p></header>
+      ${modeTabs}
       <details class="block" style="margin:0 0 24px"><summary class="link">How do I add a new client?</summary>
         <ol class="steps-help" style="margin-top:14px"><li>Send them to <code>rarefeature.com/client.html</code> and have them sign in with their email (a one-time link — no password).</li>
         <li>They’ll appear in the list below. Until you assign a plan they see “Your portal is being set up.”</li>
@@ -140,8 +158,18 @@
   };
 
   view.addEventListener("click", (e) => {
-    const el = e.target.closest("[data-client],[data-tab],[data-act]");
+    const el = e.target.closest("[data-client],[data-tab],[data-act],[data-mode],[data-lead]");
     if (!el) return;
+    if (el.dataset.mode) { mode = el.dataset.mode; render(); return; }
+    if (el.dataset.lead) {
+      const id = el.dataset.lead, st = el.dataset.status;
+      if (st === "delete" && !confirm("Delete this lead?")) return;
+      run(async () => {
+        if (st === "delete") await api.remove("leads", id); else await api.save("leads", { ...leads.find((l) => l.id === id), status: st });
+        leads = await api.list("leads");
+      }, st === "delete" ? "Deleted." : "Updated.");
+      return;
+    }
     if (el.dataset.client) run(async () => { current = el.dataset.client; await loadTab(); });
     else if (el.dataset.tab) run(async () => { tab = el.dataset.tab; await loadTab(); });
     else if (el.dataset.act === "edit") { editing = rows.find((r) => r.id === el.dataset.id); render(); view.querySelector("#row-form")?.scrollIntoView({ block: "center" }); }

@@ -18,11 +18,12 @@
     approved: "Approved", scheduled: "Scheduled", posted: "Posted",
     onboarding: "Onboarding", active: "Active", paused: "Paused", cancel_requested: "Cancellation requested", cancelled: "Cancelled",
     completed: "Completed", open: "Open", in_progress: "In progress", done: "Done",
+    new: "New", contacted: "Contacted", closed: "Closed",
   };
 
   const ORDER = {
     profiles: ["created_at", false], deliverables: ["month", false], filming_sessions: ["starts_at", true],
-    reports: ["month", false], requests: ["created_at", false],
+    reports: ["month", false], requests: ["created_at", false], leads: ["created_at", false],
   };
 
   // ---------- helpers ----------
@@ -116,6 +117,10 @@
     reports: [
       { id: uid(), client_id: C1, month: month(-1), headline: "Strong first full month", summary: "Reels outperformed photo posts across the board. The “why we opened” story drove the most profile visits, so we’re planning two more founder-led videos.", url: "https://example.com/report" },
       { id: uid(), client_id: C1, month: month(-2), headline: "Launch month", summary: "Profile refreshed, content pillars set, and the first batch of videos went live. Baseline numbers recorded for future comparison.", url: "https://example.com/report" },
+    ],
+    leads: [
+      { id: uid(), name: "Jordan Blake", email: "jordan@blakefitness.co", type: "Business", handle: "@blakefitness", interest: "Growth ($1,497/mo)", message: "We post every day and nothing lands. Can you take a look?", status: "new", created_at: day(-1).toISOString() },
+      { id: uid(), name: "Priya N.", email: "priya@example.com", type: "Content creator", handle: "@priyacooks", interest: "Free Instagram audit", message: "", status: "contacted", created_at: day(-5).toISOString() },
     ],
     requests: [
       { id: uid(), client_id: C1, kind: "support", message: "Can we add our new Saturday hours to the next video?", status: "done", created_at: day(-9).toISOString() },

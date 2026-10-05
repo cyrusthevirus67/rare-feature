@@ -142,5 +142,23 @@ drop policy if exists "client creates own requests" on public.requests;
 create policy "client creates own requests" on public.requests for insert
   with check (client_id = auth.uid() and kind in ('support', 'change') and status = 'open');
 
+-- Website contact form: anyone can submit a request; only admins can read them.
+create table if not exists public.leads (
+  id uuid primary key default gen_random_uuid(),
+  name text not null check (char_length(name) <= 200),
+  email text not null check (char_length(email) <= 320),
+  type text check (char_length(type) <= 50),
+  handle text check (char_length(handle) <= 300),
+  interest text check (char_length(interest) <= 100),
+  message text check (char_length(message) <= 5000),
+  status text not null default 'new',               -- new | contacted | closed
+  created_at timestamptz not null default now()
+);
+alter table public.leads enable row level security;
+drop policy if exists "anyone can submit a lead" on public.leads;
+create policy "anyone can submit a lead" on public.leads for insert to anon, authenticated with check (status = 'new');
+drop policy if exists "admin manages leads" on public.leads;
+create policy "admin manages leads" on public.leads for all using (public.is_admin()) with check (public.is_admin());
+
 -- To make another person an admin later:
 --   update public.profiles set is_admin = true where email = 'someone@example.com';

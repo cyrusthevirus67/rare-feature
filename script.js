@@ -1,4 +1,4 @@
-const CONFIG = window.RF_CONFIG || { checkout: {}, portal: "", formEndpoint: "", email: "cyrus@rarefeature.com" };
+const CONFIG = window.RF_CONFIG || { checkout: {}, portal: "", formEndpoint: "", email: "cyrus@rareft.com" };
 
 const year = document.getElementById("year");
 if (year) year.textContent = new Date().getFullYear();
@@ -138,6 +138,29 @@ if (form) {
     }
 
     const data = Object.fromEntries(new FormData(form));
+    const sb = CONFIG.supabase || {};
+    if (!CONFIG.formEndpoint && sb.url && sb.anonKey) {
+      // Save the request to the portal database; it shows up under Leads in the admin page.
+      const btn = form.querySelector("button[type=submit]");
+      btn.disabled = true;
+      status.textContent = "Sending…";
+      try {
+        const res = await fetch(`${sb.url}/rest/v1/leads`, {
+          method: "POST",
+          headers: { apikey: sb.anonKey, Authorization: `Bearer ${sb.anonKey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+          body: JSON.stringify({ name: data.name.trim(), email: data.email.trim(), type: data.type, handle: data.handle.trim(), interest: data.interest, message: (data.message || "").trim() }),
+        });
+        if (!res.ok) throw new Error();
+        form.reset();
+        status.textContent = "Got it — thanks! We’ll be in touch shortly.";
+      } catch {
+        status.textContent = `Something went wrong. Email us directly at ${CONFIG.email}.`;
+        status.classList.add("is-error");
+      } finally {
+        btn.disabled = false;
+      }
+      return;
+    }
     if (!CONFIG.formEndpoint) {
       const body = `Name: ${data.name}\nEmail: ${data.email}\nI am a: ${data.type}\nHandle/site: ${data.handle || "-"}\nInterested in: ${data.interest}\n\n${data.message || ""}`;
       window.location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(`${data.interest} — ${data.name}`)}&body=${encodeURIComponent(body)}`;

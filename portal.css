@@ -73,8 +73,8 @@ body.app { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; f
 /* Badges */
 .badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: .74rem; font-weight: 600; white-space: nowrap; background: rgba(255,255,255,.07); color: #cfccc7; --dot: #8d8a85; }
 .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--dot); }
-.badge--review, .badge--cancel_requested, .badge--open { background: rgba(255,59,47,.14); color: #ff8a80; --dot: var(--red); }
-.badge--filming, .badge--in_progress, .badge--onboarding { background: rgba(96,165,250,.13); color: #9cc5fb; --dot: #60a5fa; }
+.badge--review, .badge--cancel_requested, .badge--open, .badge--new { background: rgba(255,59,47,.14); color: #ff8a80; --dot: var(--red); }
+.badge--filming, .badge--in_progress, .badge--onboarding, .badge--contacted { background: rgba(96,165,250,.13); color: #9cc5fb; --dot: #60a5fa; }
 .badge--editing, .badge--paused { background: rgba(251,191,36,.12); color: #f5cf6b; --dot: #fbbf24; }
 .badge--scheduled, .badge--approved { background: rgba(45,212,191,.12); color: #7fe3d3; --dot: #2dd4bf; }
 .badge--posted, .badge--active, .badge--completed, .badge--done { background: rgba(74,222,128,.12); color: #86e3a8; --dot: #4ade80; }
@@ -160,3 +160,6 @@ body.app { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; f
   .admin { grid-template-columns: 1fr; }
   .toast { bottom: 92px; }
 }
+
+.tabs--mode { margin-bottom: 24px; }
+.item__main a { color: inherit; text-decoration-color: var(--red); text-underline-offset: 3px; }

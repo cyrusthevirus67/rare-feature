@@ -17,5 +17,5 @@ window.RF_CONFIG = {
   supabase: { url: "https://hjvezrxvrshdlprnalin.supabase.co", anonKey: "sb_publishable_KHYN133iCCSZ8buwdY2FiA_Yoxgr7Ys" },
   // Optional form service URL (e.g. Formspree) so requests arrive without opening an email app.
   formEndpoint: "",
-  email: "cyrus@rarefeature.com",
+  email: "cyrus@rareft.com",
 };
