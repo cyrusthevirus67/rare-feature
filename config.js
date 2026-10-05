@@ -4,14 +4,14 @@
 window.RF_CONFIG = {
   // Stripe Payment Links (Stripe Dashboard → Payment Links). One per package.
   checkout: {
-    "growth-plan": "", // $497 one-time
-    starter: "",       // $997/mo
-    growth: "",        // $1,497/mo
-    premium: "",       // $2,497/mo
+    "growth-plan": "https://buy.stripe.com/3cIfZhdrj8OLgHL0Wc0RG03", // $497 one-time
+    starter: "https://buy.stripe.com/cNi14n86Z5Cz2QVbAQ0RG00",       // $997/mo
+    growth: "https://buy.stripe.com/9B6cN5af78OL8bfgVa0RG01",        // $1,497/mo
+    premium: "https://buy.stripe.com/eVq7sL1IB5Cz3UZbAQ0RG02",       // $2,497/mo
   },
   // Stripe customer portal login link (Stripe Dashboard → Settings → Billing → Customer portal).
   // Used by the "Manage billing & invoices" button inside the client portal.
-  portal: "",
+  portal: "https://billing.stripe.com/p/login/cNi14n86Z5Cz2QVbAQ0RG00",
   // Supabase project for the client portal (Supabase → Project Settings → API).
   // The anon key is designed to be public; never paste the service_role key here.
   supabase: { url: "https://hjvezrxvrshdlprnalin.supabase.co", anonKey: "sb_publishable_KHYN133iCCSZ8buwdY2FiA_Yoxgr7Ys" },
