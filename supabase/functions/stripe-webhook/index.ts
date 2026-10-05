@@ -145,10 +145,19 @@ export async function handle(req, sb, env) {
   }
 }
 
+// Privileged database key. Newer projects expose it as SUPABASE_SECRET_KEYS; older ones as SUPABASE_SERVICE_ROLE_KEY.
+function serviceKey() {
+  const direct = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (direct) return direct;
+  const raw = Deno.env.get("SUPABASE_SECRET_KEYS") ?? Deno.env.get("SUPABASE_SECRET_KEY");
+  if (!raw) return undefined;
+  try { const j = JSON.parse(raw); return typeof j === "string" ? j : (j.default ?? Object.values(j)[0]); } catch { return raw; }
+}
+
 if (typeof Deno !== "undefined") {
   Deno.serve((req) => handle(
     req,
-    createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"), { auth: { persistSession: false } }),
+    createClient(Deno.env.get("SUPABASE_URL"), serviceKey(), { auth: { persistSession: false } }),
     {
       secret: Deno.env.get("STRIPE_WEBHOOK_SECRET"),
       resend: Deno.env.get("RESEND_API_KEY"),

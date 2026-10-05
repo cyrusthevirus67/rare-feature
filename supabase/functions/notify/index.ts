@@ -10,7 +10,10 @@ const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const KIND = { support: "Message", change: "Plan change request", cancellation: "Cancellation request" };
 
 export async function handle(sb, env) {
-  if (!env.resend) return json({ skipped: "RESEND_API_KEY not set" });
+  // Health check first, so a call always tells us whether the function can reach the database.
+  const probe = await sb.from("leads").select("id", { count: "exact", head: true });
+  if (probe.error) return json({ error: `database: ${probe.error.message}`, env: env.names }, 500);
+  if (!env.resend) return json({ ok: true, database: "ok", skipped: "RESEND_API_KEY not set" });
   const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
   const send = async (subject, html, replyTo) => {
     const res = await fetch("https://api.resend.com/emails", {
@@ -47,13 +50,23 @@ export async function handle(sb, env) {
   return json({ ok: true, sent });
 }
 
+// Privileged database key. Newer projects expose it as SUPABASE_SECRET_KEYS; older ones as SUPABASE_SERVICE_ROLE_KEY.
+function serviceKey() {
+  const direct = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (direct) return direct;
+  const raw = Deno.env.get("SUPABASE_SECRET_KEYS") ?? Deno.env.get("SUPABASE_SECRET_KEY");
+  if (!raw) return undefined;
+  try { const j = JSON.parse(raw); return typeof j === "string" ? j : (j.default ?? Object.values(j)[0]); } catch { return raw; }
+}
+
 if (typeof Deno !== "undefined") {
   Deno.serve(() => handle(
-    createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"), { auth: { persistSession: false } }),
+    createClient(Deno.env.get("SUPABASE_URL"), serviceKey(), { auth: { persistSession: false } }),
     {
       resend: Deno.env.get("RESEND_API_KEY"),
       owner: Deno.env.get("OWNER_EMAIL") ?? "cyrus@rareft.com",
       from: Deno.env.get("EMAIL_FROM") ?? "Rare Feature <portal@rarefeature.com>",
+      names: Object.keys(Deno.env.toObject()).filter((k) => k.startsWith("SUPABASE_")), // names only, never values
     },
   ));
 }
