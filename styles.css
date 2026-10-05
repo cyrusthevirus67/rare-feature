@@ -17,6 +17,7 @@
 html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 400 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 img { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
 a { color: inherit; }
 ::selection { background: var(--red); color: #fff; }
 h1, h2, h3 { margin: 0 0 .5em; font-weight: 400; }
@@ -42,7 +43,7 @@ p { margin: 0 0 1em; }
 .btn--red:hover { background: var(--red-dark); transform: translateY(-2px); }
 .btn--glass { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.25); color: #fff; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .btn--glass:hover { background: rgba(255,255,255,.16); }
-.btn--line { border-color: var(--line-2); color: var(--text); }
+.btn--line { background: transparent; border-color: var(--line-2); color: var(--text); }
 .btn--line:hover { border-color: var(--text); background: var(--text); color: var(--bg); }
 
 /* Nav */
@@ -367,3 +368,5 @@ p { margin: 0 0 1em; }
   .audit .btn { width: 100%; }
   .plans { gap: 28px; }
 }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

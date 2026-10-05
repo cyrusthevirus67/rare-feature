@@ -39,14 +39,33 @@ document.querySelectorAll("[data-plan]").forEach((el) => {
 const wanted = new URLSearchParams(location.search).get("plan");
 if (interest && INTEREST[wanted]) interest.value = INTEREST[wanted];
 
-// Client portal sign-in button
-const portalBtn = document.getElementById("portal-btn");
-if (portalBtn) {
-  if (CONFIG.portal) {
-    portalBtn.href = CONFIG.portal;
+// Client sign-in page: one-time email link via Supabase, or an email fallback until it's connected
+const signin = document.getElementById("signin");
+if (signin && window.RF) {
+  const { api, configured, DEMO } = window.RF;
+  if (configured || DEMO) {
+    signin.hidden = false;
+    const msg = document.getElementById("signin-msg");
+    if (configured && !DEMO) api.session().then((s) => { if (s) location.replace("portal.html"); }).catch(() => {});
+    signin.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = signin.email.value.trim();
+      if (!signin.email.checkValidity() || !email) { msg.textContent = "Please enter a valid email."; msg.classList.add("is-error"); return; }
+      if (DEMO) { location.href = "portal.html?demo"; return; }
+      const btn = signin.querySelector("button");
+      btn.disabled = true; msg.classList.remove("is-error"); msg.textContent = "Sending…";
+      try {
+        await api.sendLink(email);
+        msg.textContent = `Check ${email} — your sign-in link is on its way. You can close this tab.`;
+      } catch (err) {
+        msg.textContent = "We couldn’t send the link. Please wait a minute and try again.";
+        msg.classList.add("is-error");
+      } finally { btn.disabled = false; }
+    });
   } else {
-    portalBtn.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Help with my plan")}`;
-    portalBtn.querySelector("span").textContent = "Email us about your plan";
+    const btn = document.getElementById("portal-btn");
+    btn.hidden = false;
+    btn.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Help with my plan")}`;
     document.getElementById("portal-note").hidden = false;
     document.getElementById("portal-how").hidden = true;
   }

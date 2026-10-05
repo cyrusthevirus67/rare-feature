@@ -10,7 +10,11 @@ window.RF_CONFIG = {
     premium: "",       // $2,497/mo
   },
   // Stripe customer portal login link (Stripe Dashboard → Settings → Billing → Customer portal).
+  // Used by the "Manage billing & invoices" button inside the client portal.
   portal: "",
+  // Supabase project for the client portal (Supabase → Project Settings → API).
+  // The anon key is designed to be public; never paste the service_role key here.
+  supabase: { url: "", anonKey: "" },
   // Optional form service URL (e.g. Formspree) so requests arrive without opening an email app.
   formEndpoint: "",
   email: "cyrus@rarefeature.com",

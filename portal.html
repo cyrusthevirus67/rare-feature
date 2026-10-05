@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client portal — Rare Feature</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="portal.css?v=1">
+</head>
+<body class="app">
+  <aside class="side">
+    <a href="index.html" class="brand" aria-label="Rare Feature home">RARE<span>●</span>FEATURE</a>
+    <p class="side__label">Client portal</p>
+    <nav class="side__nav" id="nav" aria-label="Portal">
+      <a href="#overview" data-view="overview"><svg viewBox="0 0 20 20"><path d="M3 9.500L10 3l7 6.500V17h-4.500v-5h-5v5H3z"/></svg>Overview</a>
+      <a href="#content" data-view="content"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="M8.500 7.500v5l4-2.500z"/></svg>Content<b id="review-count" hidden></b></a>
+      <a href="#schedule" data-view="schedule"><svg viewBox="0 0 20 20"><rect x="3" y="4.500" width="14" height="12.500" rx="2.500"/><path d="M3 8.500h14M7 2.500v3.500M13 2.500v3.500"/></svg>Schedule</a>
+      <a href="#reports" data-view="reports"><svg viewBox="0 0 20 20"><path d="M4 17V9M10 17V3M16 17v-5"/></svg>Reports</a>
+      <a href="#billing" data-view="billing"><svg viewBox="0 0 20 20"><rect x="2.500" y="4.500" width="15" height="11" rx="2.500"/><path d="M2.500 8.500h15"/></svg>Plan &amp; billing</a>
+      <a href="#support" data-view="support"><svg viewBox="0 0 20 20"><path d="M4 4.500h12a1.500 1.500 0 011.500 1.500v7a1.500 1.500 0 01-1.500 1.500H9l-4 3v-3H4A1.500 1.500 0 012.500 13V6A1.500 1.500 0 014 4.500z"/></svg>Support</a>
+      <a href="#account" data-view="account"><svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.500"/><path d="M3.500 17c.800-3 3.300-4.500 6.500-4.500s5.700 1.500 6.500 4.500"/></svg>Account</a>
+    </nav>
+    <div class="side__foot">
+      <a href="admin.html" class="side__admin" id="admin-link" hidden>Admin →</a>
+      <div class="who-chip"><span id="avatar">·</span><div><b id="who-name">&nbsp;</b><small id="who-biz">&nbsp;</small></div></div>
+      <button class="side__out" id="signout">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="demo-bar" id="demo-bar" hidden>Preview mode — this is sample data. Nothing you do here is saved.</div>
+    <div class="view" id="view" aria-live="polite"><p class="loading">Loading your portal…</p></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=8"></script>
+  <script src="portal-core.js?v=1"></script>
+  <script src="portal.js?v=1"></script>
+</body>
+</html>

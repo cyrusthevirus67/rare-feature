@@ -10,7 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="portal.css?v=1">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -45,23 +46,30 @@
       <div class="page__head">
         <p class="label">Client portal</p>
         <h1 class="display">Your plan,<br>your <em>control.</em></h1>
-        <p class="head__sub">Everything about your Rare Feature plan in one secure place. No password to remember — sign in with the email you used at checkout.</p>
+        <p class="head__sub">Everything about your Rare Feature plan in one secure place. Your plan, your content, your filming schedule, and your reports. No password to remember.</p>
       </div>
       <div class="portal">
         <section class="portal__card portal__card--main">
           <h2>Sign in</h2>
-          <p id="portal-how">Enter your email on the next screen and we’ll send you a one-time sign-in link. Billing is handled securely by Stripe.</p>
-          <a id="portal-btn" href="#" class="btn btn--red"><span>Sign in to my plan</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          <p id="portal-how">Enter the email you used when you signed up and we’ll send you a one-time sign-in link. No password needed.</p>
+          <form class="signin" id="signin" hidden>
+            <label class="sr-only" for="signin-email">Email</label>
+            <input id="signin-email" name="email" type="email" autocomplete="email" placeholder="you@business.com" required>
+            <button class="btn btn--red btn--block"><span>Email me a sign-in link</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+            <p class="signin__msg" id="signin-msg" role="status" aria-live="polite"></p>
+          </form>
+          <a id="portal-btn" href="#" class="btn btn--red" hidden><span>Email us about your plan</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
           <p class="portal__note" id="portal-note" hidden>Online sign-in is opening soon. Until then, email us and we’ll update, pause, or cancel your plan for you.</p>
           <p class="portal__small">Not a client yet? <a href="index.html#pricing">See packages</a> or <a href="index.html?plan=audit#contact">get a free audit</a>.</p>
         </section>
         <section class="portal__card">
           <h2>What you can do</h2>
           <ul class="can">
-            <li><i>01</i><b>See your plan</b><span>Your current package, price, and next billing date.</span></li>
-            <li><i>02</i><b>Update your card</b><span>Change the payment method used for autopay.</span></li>
-            <li><i>03</i><b>Download invoices</b><span>Every receipt, ready for your bookkeeping.</span></li>
-            <li><i>04</i><b>Cancel your plan</b><span>After the 3-month minimum, cancel anytime. It takes effect at the end of your billing period.</span></li>
+            <li><i>01</i><b>See your plan</b><span>Your package, price, and next billing date.</span></li>
+            <li><i>02</i><b>Review your content</b><span>Watch new videos, approve them, or ask for changes.</span></li>
+            <li><i>03</i><b>Check your schedule</b><span>Upcoming filming sessions and what to bring.</span></li>
+            <li><i>04</i><b>Read your reports</b><span>How your content performed each month.</span></li>
+            <li><i>05</i><b>Manage billing</b><span>Update your card, download invoices, change or cancel your plan.</span></li>
           </ul>
         </section>
       </div>
@@ -93,7 +101,9 @@
     </div>
   </footer>
 
-  <script src="config.js?v=7"></script>
-  <script src="script.js?v=7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=8"></script>
+  <script src="portal-core.js?v=1"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>
