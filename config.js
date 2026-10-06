@@ -19,7 +19,7 @@ window.RF_CONFIG = {
   //   call:    public "Book a call" scheduler on the website.
   //   filming: filming-session scheduler, shown only inside the portal to clients with an active monthly plan.
   // Leave "" to hide that scheduler.
-  calendly: { call: "", filming: "" },
+  calendly: { call: "https://calendly.com/cyrus-rareft/30min", filming: "https://calendly.com/cyrus-rareft/30min" },
   // Optional form service URL (e.g. Formspree) so requests arrive without opening an email app.
   formEndpoint: "",
   email: "cyrus@rareft.com",
