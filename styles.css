@@ -375,3 +375,5 @@ p { margin: 0 0 1em; }
 .footer__brand { display: grid; gap: 18px; justify-items: start; }
 .footer__brand img { height: 84px; width: auto; }
 @media (max-width: 600px) { .brand img { height: 28px; } }
+
+.footer__word span { -webkit-text-stroke-color: rgba(255, 59, 47, .6); }
