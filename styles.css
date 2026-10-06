@@ -50,8 +50,8 @@ p { margin: 0 0 1em; }
 .nav { position: fixed; inset: 0 0 auto; z-index: 100; transition: background .35s, border-color .35s; border-bottom: 1px solid transparent; }
 .nav.is-scrolled, .nav.is-open { background: rgba(10,10,10,.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-color: var(--line); }
 .nav__inner { display: flex; align-items: center; gap: 32px; height: 76px; }
-.brand { font-family: var(--display); font-size: 1.55rem; letter-spacing: .02em; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; line-height: 1; }
-.brand span { color: var(--red); font-size: .5em; animation: blink 1.6s steps(2, start) infinite; }
+.brand { display: inline-flex; align-items: center; text-decoration: none; line-height: 1; flex: none; }
+.brand img { display: block; height: 32px; width: auto; }
 @keyframes blink { to { visibility: hidden; } }
 .nav__links { display: flex; gap: 30px; margin-left: auto; }
 .nav__links a { text-decoration: none; font-size: .92rem; font-weight: 500; color: rgba(255,255,255,.75); transition: color .2s; }
@@ -370,3 +370,8 @@ p { margin: 0 0 1em; }
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Logo in footer */
+.footer__brand { display: grid; gap: 18px; justify-items: start; }
+.footer__brand img { height: 84px; width: auto; }
+@media (max-width: 600px) { .brand img { height: 28px; } }

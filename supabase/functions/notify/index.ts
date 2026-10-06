@@ -40,7 +40,7 @@ export function layout({ preheader = "", label = "", heading, body, cta, note = 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${BRAND.bg}" style="background:${BRAND.bg};">
 <tr><td align="center" style="padding:32px 12px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
-<tr><td class="rf-pad" bgcolor="${BRAND.ink}" style="background:${BRAND.ink};border-radius:16px 16px 0 0;padding:26px 40px;font-family:'Arial Black','Helvetica Neue',Arial,sans-serif;font-size:21px;font-weight:900;letter-spacing:1.5px;line-height:1;color:#ffffff;text-transform:uppercase;">Rare <span style="color:${BRAND.red};font-size:13px;vertical-align:middle;">&#9679;</span> Feature</td></tr>
+<tr><td class="rf-pad" bgcolor="${BRAND.ink}" style="background:${BRAND.ink};border-radius:16px 16px 0 0;padding:26px 40px;line-height:1;"><img src="https://rarefeature.com/assets/logo-email.png" width="224" height="30" alt="RARE FEATURE" style="display:block;border:0;outline:none;width:224px;height:30px;font-family:'Arial Black','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:900;letter-spacing:1.5px;color:#ffffff;"></td></tr>
 <tr><td bgcolor="${BRAND.red}" style="background:${BRAND.red};height:4px;line-height:4px;font-size:0;">&nbsp;</td></tr>
 <tr><td class="rf-pad" bgcolor="#ffffff" style="background:#ffffff;padding:40px 40px 34px;">
 ${label ? `<p style="margin:0 0 14px;font-family:${FONT};font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${BRAND.red};">${label}</p>` : ""}
