@@ -111,7 +111,7 @@
       const row = (s) => `<li class="item"><div class="date"><b>${esc(fmtDate(s.starts_at, { day: "numeric" }))}</b><span>${esc(fmtDate(s.starts_at, { month: "short" }))}</span></div>
         <div class="item__main"><b>${esc(fmtDate(s.starts_at, { weekday: "long" }))} · ${esc(fmtTime(s.starts_at))}</b><span>${esc(s.location || "Location to be confirmed")}</span>${s.notes ? `<p class="note">${esc(s.notes)}</p>` : ""}</div>
         <div class="item__side">${badge(s.status)}</div></li>`;
-      return head("Schedule", "Your filming sessions. Need to move one? Send us a message and we’ll sort it out.") +
+      return head("Schedule", "Your filming sessions. Need to move one? Send us a message and we’ll sort it out.") + booking() +
         `<section class="block"><h2 class="block__h">Upcoming</h2>${up.length ? `<ul class="list">${up.map(row).join("")}</ul>` : empty("Nothing scheduled", "We’ll add your next filming session here as soon as it’s booked.")}</section>` +
         (past.length ? `<section class="block"><h2 class="block__h">Past</h2><ul class="list list--dim">${past.map(row).join("")}</ul></section>` : "") +
         `<a class="btn btn--line btn--sm" href="#support">Request a change</a>`;
@@ -172,7 +172,7 @@
         `<section class="block"><form id="support-form" class="stack"><textarea name="message" rows="4" placeholder="How can we help?" required></textarea>
           <div class="row"><button class="btn btn--red btn--sm">Send message</button><a class="link" href="mailto:${esc(CFG.email)}">or email ${esc(CFG.email)}</a></div></form></section>
         <section class="block"><h2 class="block__h">Your requests</h2>${requests.length ? `<ul class="list">${requests.map((r) => `<li class="item">
-          <div class="item__main"><b>${esc({ support: "Message", change: "Plan change", cancellation: "Cancellation" }[r.kind] || r.kind)}</b><span>${esc(fmtDate(r.created_at))}</span>${r.message ? `<p class="note">${esc(r.message)}</p>` : ""}</div>
+          <div class="item__main"><b>${esc({ support: "Message", change: "Plan change", cancellation: "Cancellation", booking: "Filming booked" }[r.kind] || r.kind)}</b><span>${esc(fmtDate(r.created_at))}</span>${r.message ? `<p class="note">${esc(r.message)}</p>` : ""}</div>
           <div class="item__side">${badge(r.status)}</div></li>`).join("")}</ul>` : empty("Nothing yet", "Messages you send us will show up here with their status.")}</section>`;
     },
 
@@ -188,6 +188,40 @@
           <div class="row"><button class="btn btn--line btn--sm" id="signout-2">Sign out</button>${me.is_admin ? `<a class="btn btn--line btn--sm" href="admin.html${q}">Open admin</a>` : ""}</div></section>`;
     },
   };
+  // Filming-session booking (Calendly). Only clients with an active monthly plan get the scheduler.
+  const filmingUrl = (CFG.calendly || {}).filming;
+  const canSchedule = window.RFCalendly && window.RFCalendly.valid(filmingUrl);
+  const isMember = () => plan && plan.billing === "monthly" && ["active", "onboarding"].includes(plan.status);
+  const booking = () => {
+    if (!canSchedule) return "";
+    if (isMember()) {
+      const n = plan.sessions_per_month;
+      return `<section class="block"><h2 class="block__h">Book a filming session</h2>
+        <p class="muted">${n ? `Your ${esc(plan.plan)} plan includes <b>${n}</b> filming session${n > 1 ? "s" : ""} a month. ` : ""}Pick a time that works and you’ll get a calendar invite by email.</p>
+        <div class="cal" id="cal-filming"><p class="cal__msg">Loading available times…</p></div></section>`;
+    }
+    const why = !plan || plan.billing !== "monthly"
+      ? "Filming sessions are part of our monthly packages. Choose one and you can book your filming times right here."
+      : "Your plan isn’t active right now, so booking is paused. Message us and we’ll get you back on the calendar.";
+    return `<section class="block"><h2 class="block__h">Book a filming session</h2><div class="empty empty--sm"><b>Members only</b><p>${why}</p>
+      <div class="row" style="margin-top:12px">${!plan || plan.billing !== "monthly" ? `<a class="btn btn--red btn--sm" href="index.html#pricing">See packages</a>` : `<a class="btn btn--line btn--sm" href="#support">Message us</a>`}</div></div></section>`;
+  };
+  const afterRender = {
+    schedule() {
+      const el = document.getElementById("cal-filming");
+      if (el) window.RFCalendly.inline(el, filmingUrl, { name: me.full_name || "", email: me.email || "" });
+    },
+  };
+  // Let the team know a session was booked. It is confirmed by Calendly's own email either way.
+  if (canSchedule) window.RFCalendly.onBooked(async () => {
+    const note = "Booked a filming session through the scheduler.";
+    try { await api.request(me.id, "booking", note); }
+    catch { try { await api.request(me.id, "support", note); } catch (err) { console.error(err); } }
+    toast("Booked. Check your email for the calendar invite.");
+    // Refresh the data quietly; re-rendering now would wipe Calendly's confirmation screen.
+    try { await load(); } catch (err) { console.error(err); }
+  });
+
   const head = (title, sub) => `<header class="vhead"><h1>${esc(title)}</h1>${sub ? `<p>${sub}</p>` : ""}</header>`;
   const empty = (title, text) => `<div class="empty empty--sm"><b>${esc(title)}</b><p>${esc(text)}</p></div>`;
 
@@ -196,6 +230,7 @@
     const name = (location.hash.slice(1) || "overview");
     const key = views[name] ? name : "overview";
     view.innerHTML = views[key]();
+    afterRender[key]?.();
     document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("is-on", a.dataset.view === key));
     const n = needsReview().length, count = document.getElementById("review-count");
     count.hidden = !n; count.textContent = n;

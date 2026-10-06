@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://images.unsplash.com">
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="https://images.unsplash.com/photo-1611784728558-6c7d9b409cdf?auto=format&fit=crop&w=2000&q=70">
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -32,6 +32,7 @@
         <a href="#process">Process</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
+        <a href="#book" data-book hidden>Book a call</a>
       </nav>
       <a href="client.html" class="nav__login">Client login</a>
       <a href="#contact" class="btn btn--red btn--sm nav__cta" data-plan="audit">Free audit</a>
@@ -45,6 +46,7 @@
       <a href="#process">Process</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
+      <a href="#book" data-book hidden>Book a call</a>
       <a href="client.html">Client login</a>
       <a href="#contact" class="btn btn--red" data-plan="audit">Get a free audit</a>
     </div>
@@ -345,6 +347,21 @@
       </div>
     </section>
 
+    <!-- BOOK A CALL (shown when a Calendly link is set in config.js) -->
+    <section class="section section--panel book" id="book" hidden>
+      <div class="wrap">
+        <div class="head head--row">
+          <div>
+            <p class="label">Book a call</p>
+            <h2 class="display">Pick a<br>time.</h2>
+          </div>
+          <p class="head__sub">Talk through your goals with us, free. Choose a time that works and you’ll get a calendar invite right away.</p>
+        </div>
+        <div class="cal" id="book-widget"><p class="cal__msg">Loading available times…</p></div>
+        <p class="book__alt">Rather write? <a href="#contact">Send us a message instead.</a></p>
+      </div>
+    </section>
+
     <!-- CONTACT -->
     <section class="contact" id="contact">
       <div class="contact__media" aria-hidden="true">
@@ -356,6 +373,7 @@
           <h2 class="display display--xl">Ready to get <em>featured?</em></h2>
           <p class="head__sub">Request your free audit or ask about a package. Tell us a little about yourself and we’ll be in touch.</p>
           <a class="contact__mail" href="mailto:cyrus@rareft.com">cyrus@rareft.com <span aria-hidden="true">↗</span></a>
+          <p class="contact__book" data-book hidden><a href="#book" class="btn btn--glass">Or book a call <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
         </div>
         <form class="form" id="contact-form" novalidate>
           <div class="form__row">
@@ -393,7 +411,7 @@
       <div class="footer__top">
         <div class="footer__brand"><img src="assets/logo-full.png?v=3" alt="Rare Feature" width="749" height="449" loading="lazy"><p>Social media growth &amp; consulting<br>for businesses and creators.</p></div>
         <nav aria-label="Footer">
-          <a href="#services">Services</a><a href="#who">Who we help</a><a href="#process">Process</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
+          <a href="#services">Services</a><a href="#who">Who we help</a><a href="#process">Process</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#book" data-book hidden>Book a call</a>
         </nav>
         <div>
           <a href="mailto:cyrus@rareft.com">cyrus@rareft.com</a>
@@ -410,7 +428,8 @@
     </div>
   </footer>
 
-  <script src="config.js?v=11"></script>
-  <script src="script.js?v=9"></script>
+  <script src="config.js?v=12"></script>
+  <script src="calendly.js?v=1"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>

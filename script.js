@@ -71,6 +71,21 @@ if (signin && window.RF) {
   }
 }
 
+// Calendly: the "Book a call" section and its links appear only when a link is set in config.js
+const callUrl = (CONFIG.calendly || {}).call;
+const bookSection = document.getElementById("book");
+if (bookSection && window.RFCalendly && window.RFCalendly.valid(callUrl)) {
+  document.querySelectorAll("[data-book]").forEach((el) => { el.hidden = false; });
+  bookSection.hidden = false;
+  // Load Calendly only when the visitor gets close to the section, so the page stays fast.
+  const widget = document.getElementById("book-widget");
+  const start = () => window.RFCalendly.inline(widget, callUrl);
+  const nearby = new IntersectionObserver((entries) => {
+    if (entries.some((e) => e.isIntersecting)) { nearby.disconnect(); start(); }
+  }, { rootMargin: "800px" });
+  nearby.observe(bookSection);
+}
+
 // Hero REC timecode
 const tc = document.getElementById("timecode");
 if (tc) {

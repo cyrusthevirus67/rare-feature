@@ -377,3 +377,14 @@ p { margin: 0 0 1em; }
 @media (max-width: 600px) { .brand img { height: 28px; } }
 
 .footer__word span { -webkit-text-stroke-color: rgba(255, 59, 47, .6); }
+
+/* Calendly scheduler */
+.cal { height: 760px; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); display: grid; }
+.cal iframe { width: 100%; height: 100%; border: 0; display: block; }
+.cal .calendly-inline-widget, .cal > div { height: 100%; }
+.cal__msg { place-self: center; margin: 0; padding: 24px; color: var(--muted); text-align: center; }
+.cal__msg a { color: var(--text); text-decoration-color: var(--red); text-underline-offset: 3px; }
+.book__alt { margin: 24px 0 0; color: var(--muted); }
+.book__alt a { color: var(--text); font-weight: 600; text-decoration-color: var(--red); text-underline-offset: 3px; }
+.contact__book { margin: 28px 0 0; }
+@media (max-width: 600px) { .cal { height: 820px; border-radius: 16px; } }

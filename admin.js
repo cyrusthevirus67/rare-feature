@@ -41,7 +41,7 @@
     requests: {
       label: "Requests", noun: "request", noAdd: true,
       fields: [["status", "select", "Status", opts(["open", "in_progress", "done"])]],
-      row: (r) => [{ support: "Message", change: "Plan change", cancellation: "Cancellation" }[r.kind] || r.kind, fmtDate(r.created_at), r.message || ""],
+      row: (r) => [{ support: "Message", change: "Plan change", cancellation: "Cancellation", booking: "Filming booked" }[r.kind] || r.kind, fmtDate(r.created_at), r.message || ""],
     },
   };
 

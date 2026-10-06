@@ -140,7 +140,7 @@ end $$;
 
 drop policy if exists "client creates own requests" on public.requests;
 create policy "client creates own requests" on public.requests for insert
-  with check (client_id = auth.uid() and kind in ('support', 'change') and status = 'open');
+  with check (client_id = auth.uid() and kind in ('support', 'change', 'booking') and status = 'open');
 
 -- Website contact form: anyone can submit a request; only admins can read them.
 create table if not exists public.leads (

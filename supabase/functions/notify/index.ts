@@ -7,7 +7,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 const SITE = "https://rarefeature.com";
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const KIND = { support: "Message", change: "Plan change request", cancellation: "Cancellation request" };
+const KIND = { support: "Message", change: "Plan change request", cancellation: "Cancellation request", booking: "Filming session booked" };
 
 // ---- Branded email design ----
 // The same block lives in both edge functions (they deploy as single files) and produced the

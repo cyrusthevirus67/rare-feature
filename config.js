@@ -15,6 +15,11 @@ window.RF_CONFIG = {
   // Supabase project for the client portal (Supabase → Project Settings → API).
   // The anon key is designed to be public; never paste the service_role key here.
   supabase: { url: "https://hjvezrxvrshdlprnalin.supabase.co", anonKey: "sb_publishable_KHYN133iCCSZ8buwdY2FiA_Yoxgr7Ys" },
+  // Calendly links (Calendly → Event types → Copy link), e.g. "https://calendly.com/yourname/intro-call".
+  //   call:    public "Book a call" scheduler on the website.
+  //   filming: filming-session scheduler, shown only inside the portal to clients with an active monthly plan.
+  // Leave "" to hide that scheduler.
+  calendly: { call: "", filming: "" },
   // Optional form service URL (e.g. Formspree) so requests arrive without opening an email app.
   formEndpoint: "",
   email: "cyrus@rareft.com",
