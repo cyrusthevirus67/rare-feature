@@ -19,11 +19,12 @@
     onboarding: "Onboarding", active: "Active", paused: "Paused", cancel_requested: "Cancellation requested", cancelled: "Cancelled",
     completed: "Completed", open: "Open", in_progress: "In progress", done: "Done",
     new: "New", contacted: "Contacted", closed: "Closed",
+    sent: "Awaiting signature", signed: "Signed", void: "Withdrawn",
   };
 
   const ORDER = {
     profiles: ["created_at", false], deliverables: ["month", false], filming_sessions: ["starts_at", true],
-    reports: ["month", false], requests: ["created_at", false], leads: ["created_at", false],
+    reports: ["month", false], requests: ["created_at", false], leads: ["created_at", false], agreements: ["created_at", false],
   };
 
   // ---------- helpers ----------
@@ -73,6 +74,16 @@
       else ok(await sb.from("requests").insert({ client_id: clientId, kind, message }));
     },
     async saveProfile(f) { ok(await sb.rpc("update_my_profile", { p_full_name: f.full_name, p_business_name: f.business_name, p_instagram: f.instagram })); },
+    // agreements + e-signature
+    async getAgreement(id) { return ok(await sb.rpc("get_agreement", { p_id: id })); },
+    async signAgreement(id, name, consent, drawing) { return ok(await sb.rpc("sign_agreement", { p_id: id, p_name: name, p_consent: consent, p_drawing: drawing || null })); },
+    async myAgreements(email) {
+      if (!email) return [];
+      return ok(await sb.from("agreements").select("id, title, status, created_at, signed_at").eq("party_email", email.toLowerCase()).neq("status", "void").order("created_at", { ascending: false }));
+    },
+    async agreements() { return ok(await sb.from("agreements").select("id, template, title, party_name, party_email, party_org, status, created_at, signed_at, signed_name").order("created_at", { ascending: false })); },
+    async createAgreement(row) { return ok(await sb.from("agreements").insert(row).select("id").single()); },
+    async voidAgreement(id) { ok(await sb.from("agreements").update({ status: "void" }).eq("id", id)); },
     // admin
     async clients() { return this.list("profiles"); },
     async save(table, row) { return ok(await sb.from(table).upsert(row).select()); },
@@ -122,12 +133,18 @@
       { id: uid(), name: "Jordan Blake", email: "jordan@blakefitness.co", type: "Business", handle: "@blakefitness", interest: "Growth ($1,497/mo)", message: "We post every day and nothing lands. Can you take a look?", status: "new", created_at: day(-1).toISOString() },
       { id: uid(), name: "Priya N.", email: "priya@example.com", type: "Content creator", handle: "@priyacooks", interest: "Free Instagram audit", message: "", status: "contacted", created_at: day(-5).toISOString() },
     ],
+    agreements: [],
     requests: [
       { id: uid(), client_id: C1, kind: "support", message: "Can we add our new Saturday hours to the next video?", status: "done", created_at: day(-9).toISOString() },
       { id: uid(), client_id: C3, kind: "support", message: "Just signed up — when do we start?", status: "open", created_at: day(-2).toISOString() },
     ],
   };
-  const pause = (v) => new Promise((r) => setTimeout(() => r(structuredClone(v)), 120));
+  // Demo agreements are kept for the browser session, so a link made on the admin page opens on the signing page.
+  try { db.agreements = JSON.parse(sessionStorage.getItem("rf-demo-agreements") || "[]"); } catch { db.agreements = []; }
+  const pause = (v) => new Promise((r) => setTimeout(() => {
+    try { sessionStorage.setItem("rf-demo-agreements", JSON.stringify(db.agreements)); } catch { /* private mode */ }
+    r(structuredClone(v));
+  }, 120));
   const sortBy = (table, rows) => {
     const [col, asc] = ORDER[table];
     return [...rows].sort((a, b) => (a[col] < b[col] ? -1 : a[col] > b[col] ? 1 : 0) * (asc ? 1 : -1));
@@ -150,6 +167,24 @@
       return pause(null);
     },
     saveProfile(f) { Object.assign(db.profiles[0], f); return pause(null); },
+    getAgreement: (id) => pause(db.agreements.find((a) => a.id === id) || null),
+    signAgreement(id, name, consent, drawing) {
+      const a = db.agreements.find((x) => x.id === id);
+      if (!a || a.status !== "sent") return Promise.reject(new Error("This agreement is not available for signing."));
+      Object.assign(a, { status: "signed", signed_name: name.trim(), signed_at: new Date().toISOString(), signed_consent: !!consent, signed_ip: "203.0.113.24", signed_drawing: drawing || null });
+      return pause(a);
+    },
+    myAgreements: (email) => pause(sortBy("agreements", db.agreements.filter((a) => a.party_email === (email || "").toLowerCase() && a.status !== "void"))),
+    agreements: () => pause(sortBy("agreements", db.agreements)),
+    async createAgreement(row) {
+      const bytes = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(row.body_html)));
+      const a = { ...row, id: crypto.randomUUID(), status: "sent", party_email: (row.party_email || "").toLowerCase() || null,
+        body_sha256: [...bytes].map((b) => b.toString(16).padStart(2, "0")).join(""),
+        provider_signed_at: row.provider_signed_name ? new Date().toISOString() : null, created_at: new Date().toISOString() };
+      db.agreements.push(a);
+      return pause({ id: a.id });
+    },
+    voidAgreement(id) { const a = db.agreements.find((x) => x.id === id); if (a && a.status === "sent") a.status = "void"; return pause(null); },
     clients: () => pause(sortBy("profiles", db.profiles)),
     save(table, row) {
       const key = table === "client_plans" ? "client_id" : "id";

@@ -6,7 +6,7 @@
 
   if (!DEMO && !configured) { location.replace("client.html"); return; }
 
-  let me, plan, deliverables, sessions, reports, requests;
+  let me, plan, deliverables, sessions, reports, requests, agreements = [];
   try {
     me = await api.me();
     if (!me) { location.replace("client.html"); return; }
@@ -19,6 +19,8 @@
     [plan, deliverables, sessions, reports, requests] = await Promise.all([
       api.plan(me.id), api.list("deliverables", me.id), api.list("filming_sessions", me.id), api.list("reports", me.id), api.list("requests", me.id),
     ]);
+    // Agreements live in a table added later; a client's portal must still load if it isn't there yet.
+    try { agreements = await api.myAgreements(me.email); } catch (err) { console.warn("agreements unavailable", err); agreements = []; }
   };
 
   // ---------- shell ----------
@@ -56,6 +58,7 @@
       const report = reports[0];
       return `<header class="vhead"><p class="vhead__k">${esc(fmtDate(new Date(), { weekday: "long", month: "long", day: "numeric" }))}</p>
           <h1>Welcome back${me.full_name ? `, ${esc(me.full_name.split(" ")[0])}` : ""}</h1></header>
+        ${toSign().length ? `<a class="alert" href="${signUrl(toSign()[0].id)}" target="_blank" rel="noopener"><b>Your ${esc(toSign()[0].title)} is ready to sign</b><span>Review &amp; sign →</span></a>` : ""}
         ${review.length ? `<a class="alert" href="#content"><b>${review.length} video${review.length > 1 ? "s" : ""} waiting for your review</b><span>Approve or request changes →</span></a>` : ""}
         <div class="grid">
           <section class="card card--plan">
@@ -125,7 +128,7 @@
     },
 
     billing() {
-      if (!plan) return head("Plan & billing", "") + empty("No active plan", "Once you choose a package, your plan and billing details appear here.") + `<a class="btn btn--red btn--sm" href="index.html#pricing">See packages</a>`;
+      if (!plan) return head("Plan & billing", "") + empty("No active plan", "Once you choose a package, your plan and billing details appear here.") + `<a class="btn btn--red btn--sm" href="index.html#pricing">See packages</a>` + agreementsBlock();
       const monthly = plan.billing === "monthly";
       const billingBtn = CFG.portal
         ? `<a class="btn btn--red btn--sm" href="${esc(CFG.portal)}" target="_blank" rel="noopener">Manage billing &amp; invoices</a>`
@@ -152,6 +155,7 @@
             </ul>
           </section>
         </div>
+        ${agreementsBlock()}
         <section class="block"><h2 class="block__h">Payment</h2>
           <p class="muted">Update your card, download invoices, and see your payment history. Billing is handled securely by Stripe.</p>${billingBtn}</section>
         ${monthly ? `<section class="block"><h2 class="block__h">Change plan</h2>
@@ -221,6 +225,12 @@
     // Refresh the data quietly; re-rendering now would wipe Calendly's confirmation screen.
     try { await load(); } catch (err) { console.error(err); }
   });
+
+  const signUrl = (id) => `sign.html?id=${id}${DEMO ? "&demo" : ""}`;
+  const toSign = () => agreements.filter((x) => x.status === "sent");
+  const agreementsBlock = () => !agreements.length ? "" : `<section class="block"><h2 class="block__h">Agreements</h2><ul class="list">${agreements.map((x) => `<li class="item${x.status === "sent" ? " item--review" : ""}">
+      <div class="item__main"><b>${esc(x.title)}</b><span>${x.status === "signed" ? `Signed ${esc(fmtDate(x.signed_at))}` : `Sent ${esc(fmtDate(x.created_at))}`}</span></div>
+      <div class="item__side">${badge(x.status)}<a class="btn ${x.status === "sent" ? "btn--red" : "btn--line"} btn--xs" href="${signUrl(x.id)}" target="_blank" rel="noopener">${x.status === "sent" ? "Review & sign" : "View signed copy"}</a></div></li>`).join("")}</ul></section>`;
 
   const head = (title, sub) => `<header class="vhead"><h1>${esc(title)}</h1>${sub ? `<p>${sub}</p>` : ""}</header>`;
   const empty = (title, text) => `<div class="empty empty--sm"><b>${esc(title)}</b><p>${esc(text)}</p></div>`;

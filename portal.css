@@ -164,3 +164,14 @@ body.app { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; f
 
 .tabs--mode { margin-bottom: 24px; }
 .item__main a { color: inherit; text-decoration-color: var(--red); text-underline-offset: 3px; }
+
+/* Agreements (admin) */
+.badge--sent { background: rgba(251,191,36,.12); color: #f5cf6b; --dot: #fbbf24; }
+.badge--signed { background: rgba(74,222,128,.12); color: #86e3a8; --dot: #4ade80; }
+.afield--check { display: flex !important; align-items: flex-start; gap: 10px; color: var(--text) !important; font-size: .9rem !important; cursor: pointer; }
+.afield--check input { width: 18px !important; height: 18px; flex: none; margin-top: 1px; accent-color: var(--red); }
+.aglink { padding: 20px; border-radius: 16px; border: 1px solid rgba(74,222,128,.45); background: rgba(74,222,128,.07); margin-bottom: 16px; display: grid; gap: 8px; }
+.aglink p { margin: 0; }
+.aglink__row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.aglink__row input { flex: 1 1 280px; font-size: .85rem !important; }
+.paper--preview { margin: 0 0 16px; box-shadow: none; }

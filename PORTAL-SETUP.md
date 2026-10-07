@@ -52,3 +52,23 @@ when you process the request.
   but no emails are sent. Optional secrets: `OWNER_EMAIL` (default cyrus@rareft.com) and `EMAIL_FROM`.
 - Both functions must be deployed with "Verify JWT" turned off (Stripe and the database trigger call them
   without a Supabase login).
+
+## Contracts and e-signature
+
+- **Templates** live in `contracts.js`: Client Service Agreement, Starter Client Agreement (no-fee), Independent
+  Contractor Agreement, On-Camera Release (staff), and a paper-only Patient Authorization. They are drafts —
+  have an attorney review them. Bump a template's `version` whenever its wording changes.
+- **Creating one:** Admin → **Agreements** → pick a type, fill in the details, type your name to sign for
+  Rare Feature, and click **Create signing link**. The wording is frozen at that moment.
+- **Signing:** the other person opens the private link (`sign.html?id=…`), reads the document, types their
+  name, optionally draws a signature, ticks two boxes, and signs. No account needed. The same link then shows
+  the signed copy with a signature record (name, date and time, internet address, and a fingerprint of the
+  exact text signed) and can be printed or saved as a PDF.
+- **Rules enforced by the database** (`supabase/schema.sql`, "Agreements and e-signatures"): the text cannot be
+  edited after creation, a document can be signed only once, a signed document cannot be changed or deleted,
+  and clients can only see agreements addressed to their own email.
+- **Patient authorizations are paper-only on purpose.** They contain patient health information, which this
+  site's storage is not set up to hold. Print the blank form (Admin → Agreements → Printable blank forms),
+  have it signed at the practice, and let the practice keep the original.
+- **To switch it on:** run the "Agreements and e-signatures" section of `supabase/schema.sql` once in the
+  Supabase SQL editor. Until then the Agreements tab shows "One step left" and links cannot be saved.

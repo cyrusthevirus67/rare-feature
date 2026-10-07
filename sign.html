@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review and sign — Rare Feature</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="assets/favicon-48.png?v=2" type="image/png" sizes="48x48">
+  <link rel="icon" href="assets/favicon.png?v=2" type="image/png" sizes="512x512">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=14">
+  <link rel="stylesheet" href="sign.css?v=2">
+</head>
+<body class="signpage">
+  <header class="signbar">
+    <a href="index.html" class="brand" aria-label="Rare Feature home"><img src="assets/logo-lockup.png?v=3" alt="Rare Feature" width="718" height="96"></a>
+    <span class="signbar__tag" id="tag">Secure e-signature</span>
+    <button class="btn btn--line btn--sm" id="print" hidden>Print / Save as PDF</button>
+  </header>
+
+  <div class="demo-bar" id="demo-bar" hidden>Preview mode — this is a sample. Nothing you sign here is saved.</div>
+
+  <main class="signwrap" id="main">
+    <div class="notice" id="notice" hidden></div>
+    <article class="paper" id="doc" aria-live="polite"><p class="paper__loading">Loading document…</p></article>
+
+    <form class="signform" id="signform" hidden novalidate>
+      <h2>Sign this document</h2>
+      <p class="signform__who">Signing as <b id="who"></b></p>
+      <label>Type your full legal name
+        <input name="name" type="text" autocomplete="name" required maxlength="200">
+      </label>
+      <div class="pad">
+        <div class="pad__head"><span>Draw your signature <small>(optional)</small></span><button type="button" class="pad__clear" id="clear">Clear</button></div>
+        <canvas id="pad" width="1200" height="320" aria-label="Signature drawing area"></canvas>
+      </div>
+      <label class="tick"><input type="checkbox" name="read" required><span>I have read this document and I agree to it.</span></label>
+      <label class="tick"><input type="checkbox" name="consent" required><span>I agree to sign electronically, and I understand my electronic signature is as legally binding as a handwritten one.</span></label>
+      <button class="btn btn--red btn--block" type="submit">Sign document</button>
+      <p class="signform__msg" id="msg" role="status" aria-live="polite"></p>
+      <p class="signform__fine">When you sign, we record your name, the date and time, and your internet address with this document. You can come back to this link at any time to view or print your signed copy.</p>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=13"></script>
+  <script src="portal-core.js?v=3"></script>
+  <script src="contracts.js?v=1"></script>
+  <script src="sign.js?v=1"></script>
+</body>
+</html>

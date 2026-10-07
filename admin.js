@@ -46,6 +46,9 @@
   };
 
   let clients = [], plans = {}, openReqs = [], leads = [], mode = "clients", current = null, tab = "plan", rows = [], editing = null;
+  // agreements (contracts + e-signature)
+  const C = window.RFContracts;
+  let agreements = [], agReady = true, agTemplate = "client-service", agDraft = null, agPreview = "", agLink = null;
 
   const loadClients = async () => {
     clients = await api.clients();
@@ -53,7 +56,13 @@
     plans = Object.fromEntries(clients.map((c, i) => [c.id, all[i]]));
     openReqs = (await api.list("requests")).filter((r) => r.status !== "done");
     leads = await api.list("leads");
+    await loadAgreements();
     if (!current && clients.length) current = clients[0].id;
+  };
+  // The agreements table is added by a database update; until it has been run, show a note instead of failing.
+  const loadAgreements = async () => {
+    try { agreements = await api.agreements(); agReady = true; }
+    catch (err) { console.warn("agreements unavailable", err); agreements = []; agReady = false; }
   };
   const loadTab = async () => { rows = TABLES[tab] ? await api.list(tab, current) : []; editing = null; };
 
@@ -125,10 +134,71 @@
         <button class="btn btn--line btn--xs btn--danger" data-lead="${esc(l.id)}" data-status="delete">Delete</button></div></li>`).join("")}</ul>`
     : `<div class="empty"><h2>No leads yet</h2><p>Requests from the website’s contact form appear here.</p></div>`;
 
+  // ---------- agreements ----------
+  const signLink = (id) => new URL(`sign.html?id=${id}${DEMO ? "&demo" : ""}`, location.href).href;
+  const blankLink = (id) => `sign.html?blank=${id}${DEMO ? "&demo" : ""}`;
+  const remembered = () => { try { return JSON.parse(localStorage.getItem("rf-contract-defaults") || "{}"); } catch { return {}; } };
+  const agDefaults = (id, keep = {}) => {
+    const saved = remembered();
+    return Object.fromEntries(C.templates[id].fields.map((f) => [f.name,
+      keep[f.name] !== undefined && keep[f.name] !== "" ? keep[f.name] : f.name === "start_date" ? iso(new Date()) : saved[f.name] ?? f.default ?? (f.type === "checkbox" ? false : "")]));
+  };
+  const cfield = (f, val) => {
+    const req = f.required ? " required" : "";
+    if (f.type === "checkbox") return `<label class="afield afield--wide afield--check"><input type="checkbox" name="${f.name}"${val ? " checked" : ""}><span>${esc(f.label)}</span></label>`;
+    const control = f.type === "select"
+      ? `<select name="${f.name}">${f.options.map((o) => `<option${o === val ? " selected" : ""}>${esc(o)}</option>`).join("")}</select>`
+      : f.type === "textarea" ? `<textarea name="${f.name}" rows="4"${req}>${esc(val)}</textarea>`
+      : `<input type="${f.type}" name="${f.name}" value="${esc(val)}"${req}>`;
+    return `<label class="afield${f.wide ? " afield--wide" : ""}">${esc(f.label)}${control}</label>`;
+  };
+  const readAgForm = (form) => {
+    const t = C.templates[agTemplate], out = {};
+    t.fields.forEach((f) => { out[f.name] = f.type === "checkbox" ? form[f.name].checked : String(form[f.name].value ?? "").trim(); });
+    return out;
+  };
+
+  const agreementsView = () => {
+    if (!agDraft) agDraft = agDefaults(agTemplate);
+    const t = C.templates[agTemplate];
+    const waiting = agreements.filter((x) => x.status === "sent").length;
+    const linkCard = agLink ? `<div class="aglink"><b>Signing link ready for ${esc(agLink.party_name)}</b>
+        <p class="muted">Send them this private link. Anyone who has it can open and sign the document, so only send it to the person who should sign.</p>
+        <div class="aglink__row"><input readonly value="${esc(signLink(agLink.id))}" aria-label="Signing link" onclick="this.select()">
+          <button class="btn btn--red btn--xs" data-ag="copy" data-link="${esc(signLink(agLink.id))}">Copy link</button>
+          ${agLink.party_email ? `<a class="btn btn--line btn--xs" href="mailto:${esc(agLink.party_email)}?subject=${encodeURIComponent(`${agLink.title} — please review and sign`)}&body=${encodeURIComponent(`Hi ${agLink.party_name.split(" ")[0]},\n\nHere is your ${agLink.title} from Rare Feature. Please review and sign it at this private link:\n\n${signLink(agLink.id)}\n\nLet me know if you have any questions.\n\nThanks,\n${me.full_name || "Rare Feature"}`)}">Email it</a>` : ""}
+          <a class="btn btn--line btn--xs" href="${esc(signLink(agLink.id))}" target="_blank" rel="noopener">Open</a></div></div>` : "";
+    const form = `<form class="aform" id="ag-form"><h3>New agreement</h3>
+        <label class="afield afield--wide">Type<select name="template">${Object.entries(C.templates).map(([id, x]) => `<option value="${id}"${id === agTemplate ? " selected" : ""}>${esc(x.title)}</option>`).join("")}</select></label>
+        <p class="muted afield--wide" style="margin:-4px 0 4px">${esc(t.about)}</p>
+        ${!t.printOnly && clients.length ? `<label class="afield afield--wide">Fill in from a client (optional)<select name="_client"><option value="">—</option>${clients.map((x) => `<option value="${esc(x.id)}">${esc(x.business_name || x.full_name || x.email)}</option>`).join("")}</select></label>` : ""}
+        ${t.fields.map((f) => cfield(f, agDraft[f.name])).join("")}
+        ${t.printOnly
+          ? `<div class="row"><a class="btn btn--red btn--sm" id="ag-print" href="${blankLink(agTemplate)}" target="_blank" rel="noopener">Open printable form</a><span class="muted">Print it, have it signed on paper at the practice, and keep the original there.</span></div>`
+          : `<label class="afield afield--wide">Signed for Rare Feature by (your name — this is your signature on the agreement)<input name="_provider" value="${esc(agDraft._provider ?? me.full_name ?? "")}" required></label>
+             <div class="row"><button type="button" class="btn btn--line btn--sm" data-ag="preview">Preview</button><button class="btn btn--red btn--sm">Create signing link</button>
+             <span class="muted">Once created, the wording is locked. To change it, withdraw it and create a new one.</span></div>`}</form>`;
+    const list = agreements.length ? `<ul class="list">${agreements.map((x) => `<li class="item">
+        <div class="item__main"><b>${esc(x.title)}</b><span>${esc([x.party_name, x.party_org, x.party_email].filter(Boolean).join(" · "))}</span>
+          <span>Created ${esc(fmtDate(x.created_at))}${x.signed_at ? ` · Signed ${esc(fmtDate(x.signed_at))} by ${esc(x.signed_name || "")}` : ""}</span></div>
+        <div class="item__side">${badge(x.status)}<a class="btn btn--line btn--xs" href="${esc(signLink(x.id))}" target="_blank" rel="noopener">${x.status === "signed" ? "View signed copy" : "Open"}</a>
+          ${x.status === "sent" ? `<button class="btn btn--line btn--xs" data-ag="copy" data-link="${esc(signLink(x.id))}">Copy link</button><button class="btn btn--line btn--xs btn--danger" data-ag="void" data-id="${esc(x.id)}">Withdraw</button>` : ""}</div></li>`).join("")}</ul>`
+      : `<div class="empty empty--sm"><b>No agreements yet</b><p>Create one above and send the signing link.</p></div>`;
+    const blanks = `<section class="block"><h2 class="block__h">Printable blank forms</h2><p class="muted">For signing on paper. The patient authorization is paper-only on purpose: it contains patient health information, so the practice should keep it, not this website.</p>
+        <div class="row">${Object.entries(C.templates).map(([id, x]) => `<a class="btn btn--line btn--xs" href="${blankLink(id)}" target="_blank" rel="noopener">${esc(x.title.split(" — ")[0].split(" (")[0])}</a>`).join("")}</div></section>`;
+    return `<header class="vhead"><p class="vhead__k">Admin</p><h1>Agreements</h1><p>Create a contract, send its private signing link, and see when it’s signed. ${waiting ? `<b>${waiting} awaiting signature.</b>` : ""}</p></header>${"%%TABS%%"}
+      ${agReady ? "" : `<div class="alert" style="cursor:default"><b>One step left to switch this on</b><span>The agreements database update hasn’t been run yet, so signing links can’t be saved.</span></div>`}
+      ${linkCard}${form}${agPreview ? `<article class="paper paper--preview">${agPreview}</article>` : ""}
+      <section class="block"><h2 class="block__h">All agreements</h2>${list}</section>${blanks}`;
+  };
+
   const render = () => {
     const newLeads = leads.filter((l) => l.status === "new").length;
+    const waitingAg = agreements.filter((x) => x.status === "sent").length;
     const modeTabs = `<div class="tabs tabs--mode"><button data-mode="clients" class="${mode === "clients" ? "is-on" : ""}">Clients (${clients.length})</button>
-      <button data-mode="leads" class="${mode === "leads" ? "is-on" : ""}">Leads${newLeads ? ` · ${newLeads} new` : ""}</button></div>`;
+      <button data-mode="leads" class="${mode === "leads" ? "is-on" : ""}">Leads${newLeads ? ` · ${newLeads} new` : ""}</button>
+      <button data-mode="agreements" class="${mode === "agreements" ? "is-on" : ""}">Agreements${waitingAg ? ` · ${waitingAg} waiting` : ""}</button></div>`;
+    if (mode === "agreements") { view.innerHTML = agreementsView().replace("%%TABS%%", modeTabs); return; }
     if (mode === "leads") {
       view.innerHTML = `<header class="vhead"><p class="vhead__k">Admin</p><h1>Leads</h1><p>Free-audit and package requests sent through the website. Reply by email, then mark them contacted.</p></header>${modeTabs}${leadsView()}`;
       return;
@@ -158,8 +228,25 @@
   };
 
   view.addEventListener("click", (e) => {
-    const el = e.target.closest("[data-client],[data-tab],[data-act],[data-mode],[data-lead]");
+    const el = e.target.closest("[data-client],[data-tab],[data-act],[data-mode],[data-lead],[data-ag]");
     if (!el) return;
+    if (el.dataset.ag === "copy") {
+      navigator.clipboard?.writeText(el.dataset.link).then(() => toast("Link copied."), () => toast("Couldn’t copy. Select the link and copy it by hand.", true));
+      return;
+    }
+    if (el.dataset.ag === "preview") {
+      const f = document.getElementById("ag-form");
+      agDraft = { ...readAgForm(f), _provider: f._provider.value };
+      const out = C.render(agTemplate, agDraft);
+      agPreview = `<header class="paper__head"><h1>${esc(out.title)}</h1><p>Preview — not sent yet</p></header><div class="paper__body">${out.html}</div>`;
+      render(); view.querySelector(".paper--preview")?.scrollIntoView({ block: "start", behavior: "smooth" });
+      return;
+    }
+    if (el.dataset.ag === "void") {
+      if (!confirm("Withdraw this agreement? Its link will stop working for signing.")) return;
+      run(async () => { await api.voidAgreement(el.dataset.id); await loadAgreements(); if (agLink?.id === el.dataset.id) agLink = null; }, "Withdrawn.");
+      return;
+    }
     if (el.dataset.mode) { mode = el.dataset.mode; render(); return; }
     if (el.dataset.lead) {
       const id = el.dataset.lead, st = el.dataset.status;
@@ -182,6 +269,28 @@
 
   view.addEventListener("change", (e) => {
     const f = e.target.form;
+    if (f && f.id === "ag-form") {
+      const name = e.target.name;
+      if (name === "template") {
+        const keep = C.templates[agTemplate].printOnly ? {} : readAgForm(f);
+        agTemplate = e.target.value; agDraft = agDefaults(agTemplate, keep); agPreview = ""; render();
+      } else if (C.templates[agTemplate].printOnly) {
+        // keep the "Open printable form" link in step with what was typed (e.g. the practice name)
+        const link = document.getElementById("ag-print");
+        if (link) link.href = `${blankLink(agTemplate)}&org=${encodeURIComponent(f.party_org?.value || "")}&co=${encodeURIComponent(f.company_legal?.value || "")}`;
+      } else if (name === "package" && C.PACKAGES[e.target.value]) {
+        const p = C.PACKAGES[e.target.value];
+        ["price", "sessions", "videos", "platforms", "extras"].forEach((k) => { if (f[k]) f[k].value = p[k]; });
+      } else if (name === "_client" && e.target.value) {
+        const c = clients.find((x) => x.id === e.target.value), p = plans[c.id];
+        if (f.party_name && c.full_name) f.party_name.value = c.full_name;
+        if (f.party_email && c.email) f.party_email.value = c.email;
+        if (f.party_org && c.business_name) f.party_org.value = c.business_name;
+        if (p && f.package && C.PACKAGES[p.plan]) { f.package.value = p.plan; f.package.dispatchEvent(new Event("change", { bubbles: true })); }
+        if (p && f.price) f.price.value = p.price_cents / 100;
+      }
+      return;
+    }
     if (!f || f.id !== "plan-form") return;
     if (e.target.name === "plan") {
       const p = PLANS[e.target.value];
@@ -196,6 +305,27 @@
   view.addEventListener("submit", (e) => {
     e.preventDefault();
     const f = e.target;
+    if (f.id === "ag-form") {
+      const t = C.templates[agTemplate];
+      if (t.printOnly) return;
+      const fields = readAgForm(f), provider = f._provider.value.trim();
+      const missing = t.fields.find((x) => x.required && !String(fields[x.name] ?? "").trim());
+      if (missing) { toast(`Please fill in: ${missing.label}`, true); f[missing.name].focus(); return; }
+      if (provider.length < 2) { toast("Type your name to sign for Rare Feature.", true); f._provider.focus(); return; }
+      const out = C.render(agTemplate, fields);
+      try { localStorage.setItem("rf-contract-defaults", JSON.stringify({ company_legal: fields.company_legal, state: fields.state || remembered().state })); } catch { /* private mode */ }
+      run(async () => {
+        const made = await api.createAgreement({
+          template: agTemplate, template_version: out.version, title: out.title, body_html: out.html, fields,
+          party_name: fields.party_name, party_email: fields.party_email || null, party_org: fields.party_org || null, provider_signed_name: provider,
+        });
+        agLink = { id: made.id, title: out.title, party_name: fields.party_name, party_email: fields.party_email };
+        agDraft = null; agPreview = "";
+        await loadAgreements();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, "Agreement created. Send the signing link.");
+      return;
+    }
     if (f.id === "plan-form") {
       const d = readForm(f, PLAN_FIELDS);
       if (d.billing === "monthly" && d.started_on && !d.minimum_term_ends) { const x = new Date(`${d.started_on}T12:00:00`); x.setMonth(x.getMonth() + 3); d.minimum_term_ends = iso(x); }
