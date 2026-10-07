@@ -1,0 +1,11 @@
+{
+  "name": "Rare Feature",
+  "short_name": "Rare Feature",
+  "icons": [
+    { "src": "assets/favicon.png?v=4", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/apple-touch-icon.png?v=4", "sizes": "180x180", "type": "image/png" }
+  ],
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "display": "browser"
+}
