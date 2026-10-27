@@ -1,0 +1,36 @@
+    <div class="wrap">
+      <div class="page__head">
+        <p class="label">Client portal</p>
+        <h1 class="display">Your plan,<br>your <em>control.</em></h1>
+        <p class="head__sub">Everything about your Rare Feature plan in one secure place. Your plan, your content, your filming schedule, and your reports. No password to remember.</p>
+      </div>
+      <div class="portal">
+        <section class="portal__card portal__card--main">
+          <h2>Sign in</h2>
+          <p id="portal-how">Enter the email you used when you signed up and we’ll send you a one-time sign-in link. No password needed.</p>
+          <form class="signin" id="signin" hidden>
+            <label class="sr-only" for="signin-email">Email</label>
+            <input id="signin-email" name="email" type="email" autocomplete="email" placeholder="you@business.com" required>
+            <button class="btn btn--red btn--block"><span>Email me a sign-in link</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+            <p class="signin__msg" id="signin-msg" role="status" aria-live="polite"></p>
+          </form>
+          <a id="portal-btn" href="#" class="btn btn--red" hidden><span>Email us about your plan</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          <p class="portal__note" id="portal-note" hidden>Online sign-in is opening soon. Until then, email us and we’ll update, pause, or cancel your plan for you.</p>
+          <p class="portal__small">Not a client yet? <a href="/pricing">See packages</a> or <a href="/contact?plan=audit">get a free audit</a>.</p>
+        </section>
+        <section class="portal__card">
+          <h2>What you can do</h2>
+          <ul class="can">
+            <li><i>01</i><b>See your plan</b><span>Your package, price, and next billing date.</span></li>
+            <li><i>02</i><b>Review your content</b><span>Watch new videos, approve them, or ask for changes.</span></li>
+            <li><i>03</i><b>Check your schedule</b><span>Upcoming filming sessions and what to bring.</span></li>
+            <li><i>04</i><b>Read your reports</b><span>How your content performed each month.</span></li>
+            <li><i>05</i><b>Manage billing</b><span>Update your card, download invoices, change or cancel your plan.</span></li>
+          </ul>
+        </section>
+      </div>
+      <div class="page__actions">
+        <a href="mailto:cyrus@rareft.com" class="btn btn--line">Need help? Email us</a>
+        <a href="/terms" class="btn btn--line">Billing &amp; cancellation terms</a>
+      </div>
+    </div>

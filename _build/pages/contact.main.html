@@ -1,0 +1,41 @@
+    <section class="contact contact--page" id="contact">
+      <div class="contact__media" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1632187981988-40f3cbaeef5e?auto=format&fit=crop&w=2000&q=65" alt="" fetchpriority="high">
+      </div>
+      <div class="wrap contact__grid">
+        <div class="contact__copy">
+          <p class="label">Contact</p>
+          <h1 class="display display--xl">Ready to get <em>featured?</em></h1>
+          <p class="head__sub">Request your free audit or ask about a package. Tell us a little about yourself and we’ll be in touch.</p>
+          <a class="contact__mail" href="mailto:cyrus@rareft.com">cyrus@rareft.com <span aria-hidden="true">↗</span></a>
+          <p class="contact__book"><a href="/book" class="btn btn--glass">Or book a call {{arrow}}</a></p>
+        </div>
+        <form class="form" id="contact-form" novalidate>
+          <div class="form__row">
+            <label>Name<input name="name" type="text" autocomplete="name" required></label>
+            <label>Email<input name="email" type="email" autocomplete="email" required></label>
+          </div>
+          <fieldset class="form__choice">
+            <legend>I am a</legend>
+            <label class="chip"><input type="radio" name="type" value="Business" checked><span>Business</span></label>
+            <label class="chip"><input type="radio" name="type" value="Content creator"><span>Content creator</span></label>
+          </fieldset>
+          <div class="form__row">
+            <label>Instagram handle or website<input name="handle" type="text" placeholder="@yourhandle"></label>
+            <label>I’m interested in
+              <select name="interest" id="interest">
+                <option value="Free Instagram audit">Free Instagram audit</option>
+                <option value="Growth Plan ($497 one-time)">Growth Plan — $497 one-time</option>
+                <option value="Starter ($997/mo)">Starter — $997/mo</option>
+                <option value="Growth ($1,497/mo)">Growth — $1,497/mo</option>
+                <option value="Premium ($2,497/mo)">Premium — $2,497/mo</option>
+                <option value="Not sure yet">Not sure yet</option>
+              </select>
+            </label>
+          </div>
+          <label><span>Anything we should know? <span class="opt">(optional)</span></span><textarea name="message" rows="3"></textarea></label>
+          <button type="submit" class="btn btn--red btn--block">Send my request {{arrow}}</button>
+          <p class="form__status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>

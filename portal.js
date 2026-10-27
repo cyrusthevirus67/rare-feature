@@ -47,7 +47,7 @@
         return `<header class="vhead"><h1>Welcome${me.full_name ? `, ${esc(me.full_name.split(" ")[0])}` : ""}</h1></header>
           <div class="empty"><h2>Your portal is being set up</h2>
           <p>Thanks for signing in. As soon as your plan is active you’ll see your content, filming schedule, and reports here.</p>
-          <div class="row"><a class="btn btn--red btn--sm" href="index.html#pricing">See packages</a><a class="btn btn--line btn--sm" href="#support">Message us</a></div></div>`;
+          <div class="row"><a class="btn btn--red btn--sm" href="/pricing">See packages</a><a class="btn btn--line btn--sm" href="#support">Message us</a></div></div>`;
       }
       const month = deliverables.filter((d) => d.month.slice(0, 7) === thisMonth());
       const done = month.filter((d) => ["approved", "scheduled", "posted"].includes(d.status)).length;
@@ -128,7 +128,7 @@
     },
 
     billing() {
-      if (!plan) return head("Plan & billing", "") + empty("No active plan", "Once you choose a package, your plan and billing details appear here.") + `<a class="btn btn--red btn--sm" href="index.html#pricing">See packages</a>` + agreementsBlock();
+      if (!plan) return head("Plan & billing", "") + empty("No active plan", "Once you choose a package, your plan and billing details appear here.") + `<a class="btn btn--red btn--sm" href="/pricing">See packages</a>` + agreementsBlock();
       const monthly = plan.billing === "monthly";
       const billingBtn = CFG.portal
         ? `<a class="btn btn--red btn--sm" href="${esc(CFG.portal)}" target="_blank" rel="noopener">Manage billing &amp; invoices</a>`
@@ -208,7 +208,7 @@
       ? "Filming sessions are part of our monthly packages. Choose one and you can book your filming times right here."
       : "Your plan isn’t active right now, so booking is paused. Message us and we’ll get you back on the calendar.";
     return `<section class="block"><h2 class="block__h">Book a filming session</h2><div class="empty empty--sm"><b>Members only</b><p>${why}</p>
-      <div class="row" style="margin-top:12px">${!plan || plan.billing !== "monthly" ? `<a class="btn btn--red btn--sm" href="index.html#pricing">See packages</a>` : `<a class="btn btn--line btn--sm" href="#support">Message us</a>`}</div></div></section>`;
+      <div class="row" style="margin-top:12px">${!plan || plan.billing !== "monthly" ? `<a class="btn btn--red btn--sm" href="/pricing">See packages</a>` : `<a class="btn btn--line btn--sm" href="#support">Message us</a>`}</div></div></section>`;
   };
   const afterRender = {
     schedule() {

@@ -30,11 +30,10 @@ const INTEREST = {
   premium: "Premium ($2,497/mo)",
 };
 const interest = document.getElementById("interest");
+// Without a checkout link, the button keeps its /contact?plan=… link and the form is pre-filled there.
 document.querySelectorAll("[data-plan]").forEach((el) => {
-  const plan = el.dataset.plan;
-  const link = CONFIG.checkout[plan];
-  if (link) { el.href = link; return; }
-  el.addEventListener("click", () => { if (interest) interest.value = INTEREST[plan]; });
+  const link = CONFIG.checkout[el.dataset.plan];
+  if (link) el.href = link;
 });
 const wanted = new URLSearchParams(location.search).get("plan");
 if (interest && INTEREST[wanted]) interest.value = INTEREST[wanted];
@@ -71,19 +70,12 @@ if (signin && window.RF) {
   }
 }
 
-// Calendly: the "Book a call" section and its links appear only when a link is set in config.js
+// Calendly: the scheduler on the Book a call page
 const callUrl = (CONFIG.calendly || {}).call;
-const bookSection = document.getElementById("book");
-if (bookSection && window.RFCalendly && window.RFCalendly.valid(callUrl)) {
-  document.querySelectorAll("[data-book]").forEach((el) => { el.hidden = false; });
-  bookSection.hidden = false;
-  // Load Calendly only when the visitor gets close to the section, so the page stays fast.
-  const widget = document.getElementById("book-widget");
-  const start = () => window.RFCalendly.inline(widget, callUrl);
-  const nearby = new IntersectionObserver((entries) => {
-    if (entries.some((e) => e.isIntersecting)) { nearby.disconnect(); start(); }
-  }, { rootMargin: "800px" });
-  nearby.observe(bookSection);
+const widget = document.getElementById("book-widget");
+if (widget) {
+  if (window.RFCalendly && window.RFCalendly.valid(callUrl)) window.RFCalendly.inline(widget, callUrl);
+  else widget.innerHTML = `<p class="cal__msg">Online booking isn’t available right now. Email <a href="mailto:${CONFIG.email}">${CONFIG.email}</a> and we’ll find a time.</p>`;
 }
 
 // Hero REC timecode
