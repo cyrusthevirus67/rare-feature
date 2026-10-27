@@ -589,3 +589,5 @@ p { margin: 0 0 1em; }
 }
 .faq .head .head__sub { margin-top: 20px; }
 .contact--page .display--xl { font-size: clamp(3.4rem, 7.4vw, 7.4rem); }
+.nav__toggle { flex: none; }
+@media (max-width: 360px) { .nav__inner { gap: 16px; } .brand img { height: 22px; } }

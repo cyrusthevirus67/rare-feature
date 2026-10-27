@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = Path(__file__).resolve().parent / "pages"
 SITE = "https://rarefeature.com"
-V = {"css": 15, "js": 11, "config": 13, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
+V = {"css": 16, "js": 11, "config": 13, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
 
 ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>'
 
