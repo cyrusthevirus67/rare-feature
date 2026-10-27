@@ -36,7 +36,7 @@ window.RFContracts = (() => {
     // ------------------------------------------------------------------ 1. Client service agreement
     "client-service": {
       title: "Client Service Agreement",
-      version: "2026-10-07",
+      version: "2026-10-28",
       signer: "Client",
       about: "For every paying client. Signed before any work starts.",
       fields: [
@@ -84,8 +84,8 @@ window.RFContracts = (() => {
           h(3, "Term and cancellation"),
           ul([
             "This Agreement has a minimum term of three (3) months from the Start Date. After that it continues month to month.",
-            "After the minimum term, either party may cancel by giving thirty (30) days’ written notice (email is fine). Fees remain due through the notice period, and we keep working through it.",
-            "Notice given during the minimum term takes effect at the end of the minimum term or thirty (30) days after the notice, whichever is later.",
+            "After the minimum term, either party may cancel by written notice (the client portal or email is fine). Cancellation takes effect at the end of the current billing period. Fees for that period remain due, and we keep working through it.",
+            "If you give notice during the minimum term, cancellation takes effect at the end of the billing period in which the minimum term ends. The remaining months of the minimum term remain payable.",
             "We may suspend or end this Agreement if a payment is more than thirty (30) days late, or if you ask us to publish content we reasonably believe is unlawful or misleading.",
           ]),
 
