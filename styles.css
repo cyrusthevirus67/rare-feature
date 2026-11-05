@@ -591,3 +591,39 @@ p { margin: 0 0 1em; }
 .contact--page .display--xl { font-size: clamp(3.4rem, 7.4vw, 7.4rem); }
 .nav__toggle { flex: none; }
 @media (max-width: 360px) { .nav__inner { gap: 16px; } .brand img { height: 22px; } }
+
+/* ===== The Rare Society promotion (gold sub-brand) ===== */
+.nav__society { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 14px; border-radius: 999px; border: 1px solid rgba(226,179,95,.55); background: rgba(226,179,95,.08); color: #f1d8a6; text-decoration: none; font: italic 400 1.08rem/1 "Instrument Serif", Georgia, serif; white-space: nowrap; transition: background .2s, border-color .2s; }
+.nav__society:hover { background: rgba(226,179,95,.18); border-color: #e2b35f; }
+.nav__society span, .mobile-menu__society span { font: 700 .62rem var(--sans); font-style: normal; letter-spacing: .12em; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; background: #e2b35f; color: #16120b; }
+.mobile-menu a.mobile-menu__society { display: flex; align-items: center; justify-content: space-between; color: #e2b35f; font: italic 400 2.3rem/1 "Instrument Serif", Georgia, serif !important; text-transform: none !important; }
+@media (max-width: 1240px) and (min-width: 1101px) { .nav__links { gap: 20px; } .nav__inner { gap: 22px; } }
+@media (max-width: 1100px) { .nav__society { display: none; } }
+
+.soc-promo { padding: clamp(72px, 9vw, 120px) 0; }
+.section--panel + .soc-promo, .soc-promo:has(+ .section--panel) { background: var(--bg); }
+.soc { position: relative; overflow: hidden; isolation: isolate; display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(32px, 5vw, 72px); align-items: center; padding: clamp(32px, 5vw, 64px); border-radius: 28px; background: #12100d; border: 1px solid rgba(226,179,95,.35); color: #f4ede1; }
+.soc__glow { position: absolute; z-index: -1; right: -10%; top: -40%; width: 70%; height: 180%; background: radial-gradient(closest-side, rgba(226,179,95,.22), transparent); pointer-events: none; }
+.soc__k { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 20px; font-size: .78rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #c9bfae; }
+.soc__k span { padding: 4px 9px; border-radius: 999px; background: #e2b35f; color: #16120b; font-weight: 700; letter-spacing: .12em; }
+.soc__t { margin: 0 0 18px; font: 400 clamp(2.6rem, 5vw, 4.4rem)/.98 "Instrument Serif", Georgia, serif; letter-spacing: -0.02em; text-transform: none; }
+.soc__t em { display: block; font-style: italic; color: #e2b35f; }
+.soc__d { color: #b5ab9c; max-width: 34em; font-size: 1.05rem; margin: 0 0 22px; }
+.soc__list { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 0 0 30px; padding: 0; }
+.soc__list li { display: inline-flex; align-items: center; gap: 8px; font-size: .95rem; color: #efe6d6; }
+.soc__list li::before { content: "✓"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #e2b35f; color: #16120b; font-size: .7rem; font-weight: 800; }
+.soc__go { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; }
+.soc__btn { display: inline-flex; align-items: center; gap: .6em; height: 56px; padding: 0 28px; border-radius: 999px; background: #e2b35f; color: #16120b; font-weight: 700; text-decoration: none; box-shadow: 0 14px 34px -14px rgba(226,179,95,.7); transition: background .25s, transform .25s var(--ease); }
+.soc__btn:hover { background: #f0c879; transform: translateY(-2px); }
+.soc__btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.soc__price { margin: 0; color: #a69d8f; font-size: .95rem; }
+.soc__price b { font: 400 2.2rem/1 "Instrument Serif", Georgia, serif; color: #f4ede1; margin-right: 2px; }
+.soc__card { display: grid; justify-items: center; gap: 12px; text-align: center; padding: 40px 24px; border-radius: 22px; background: radial-gradient(80% 70% at 50% 30%, rgba(226,179,95,.18), transparent 70%), #0c0b09; border: 1px solid rgba(226,179,95,.25); text-decoration: none; color: inherit; transition: border-color .3s, transform .3s var(--ease); }
+.soc__card:hover { border-color: #e2b35f; transform: translateY(-4px); }
+.soc__card img { width: 110px; height: auto; margin-bottom: 6px; }
+.soc__name { font: 400 2.4rem/1 "Instrument Serif", Georgia, serif; }
+.soc__name i { color: #e2b35f; }
+.soc__sub { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: #a69d8f; }
+.soc__visit { margin-top: 10px; font-size: .88rem; color: #e2b35f; }
+@media (max-width: 900px) { .soc { grid-template-columns: 1fr; } .soc__card { padding: 28px 20px; } }
+@media (max-width: 600px) { .soc__btn { width: 100%; justify-content: center; } }

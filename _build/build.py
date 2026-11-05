@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = Path(__file__).resolve().parent / "pages"
 SITE = "https://rarefeature.com"
-V = {"css": 16, "js": 11, "config": 13, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
+V = {"css": 17, "js": 11, "config": 13, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
 
 ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>'
 
@@ -129,7 +129,7 @@ def head(p):
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://images.unsplash.com">
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css?v={V["css"]}">{css}
 {ORG_JSONLD if p.get("home") else ""}{HASH_REDIRECT if p.get("home") else ""}</head>
 """
@@ -149,6 +149,7 @@ def header(p):
       <a href="/" class="brand" aria-label="Rare Feature home"><img src="/assets/logo-lockup.png?v={V["logo"]}" alt="Rare Feature" width="718" height="96"></a>
       <nav class="nav__links" aria-label="Primary">{links}
       </nav>
+      <a href="https://society.rarefeature.com" class="nav__society">The Society<span>New</span></a>
       <a href="/client" class="nav__login"{cur("client")}>Client login</a>
       <a href="/book" class="btn btn--red btn--sm nav__cta"{cur("book")}>Book a call</a>
       <button class="nav__toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -156,6 +157,7 @@ def header(p):
       </button>
     </div>
     <div class="mobile-menu" id="mobile-menu" hidden>{mlinks}
+      <a href="https://society.rarefeature.com" class="mobile-menu__society">The Rare Society <span>New</span></a>
       <a href="/client">Client login</a>
       <a href="/book" class="btn btn--red">Book a call</a>
       <a href="/contact?plan=audit" class="btn btn--line">Get a free audit</a>
@@ -177,6 +179,33 @@ def cta():
         <div class="cta__actions">
           <a href="/contact?plan=audit" class="btn btn--red">Get a free audit {ARROW}</a>
           <a href="/book" class="btn btn--glass">Book a call</a>
+        </div>
+      </div>
+    </section>
+"""
+
+
+SOCIETY = f"""
+    <section class="soc-promo">
+      <div class="wrap">
+        <div class="soc reveal">
+          <div class="soc__glow" aria-hidden="true"></div>
+          <div class="soc__copy">
+            <p class="soc__k"><span>New</span> The Rare Society</p>
+            <h2 class="soc__t">Rather do it yourself? <em>Learn our system.</em></h2>
+            <p class="soc__d">Our step-by-step course on growing with social media — plus a live Q&amp;A every month and a private community to keep you posting. The most affordable way to work with us.</p>
+            <ul class="soc__list"><li>The full video course</li><li>Monthly live Q&amp;A</li><li>Members-only community</li></ul>
+            <div class="soc__go">
+              <a href="https://society.rarefeature.com" class="soc__btn">Join The Rare Society {ARROW}</a>
+              <p class="soc__price"><b>$49</b>/month · cancel anytime</p>
+            </div>
+          </div>
+          <a class="soc__card" href="https://society.rarefeature.com" aria-label="Visit The Rare Society">
+            <img src="/assets/logo-mark-society.png?v=1" alt="" width="240" height="169" loading="lazy">
+            <span class="soc__name">The Rare <i>Society</i></span>
+            <span class="soc__sub">Course · Live Q&amp;A · Community</span>
+            <span class="soc__visit">society.rarefeature.com ↗</span>
+          </a>
         </div>
       </div>
     </section>
@@ -208,6 +237,7 @@ def footer():
           <a href="/contact?plan=audit">Get a free audit</a>
           <a href="/book">Book a call</a>
           <a href="/contact">Contact</a>
+          <a href="https://society.rarefeature.com">The Rare Society</a>
           <a href="/client">Client login</a>
           <a href="mailto:cyrus@rareft.com">cyrus@rareft.com</a>
         </div>
@@ -239,7 +269,7 @@ def scripts(p):
 def build():
     for name, p in SITE_PAGES.items():
         main = (PAGES / f"{name}.main.html").read_text().rstrip() + "\n"
-        main = main.replace("{{arrow}}", ARROW)
+        main = main.replace("{{arrow}}", ARROW).replace("{{society}}", SOCIETY)
         page_cls = ' class="page"' if p.get("solid") else ""
         out = head(p) + header(p) + f'\n  <main id="main"{page_cls}>\n' + main
         if p.get("next"):
