@@ -4,6 +4,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SITE = "https://rarefeature.com";
+const SOCIETY_SITE = "https://society.rarefeature.com";
 
 // Keyed by Stripe payment link id.
 const PLANS = {
@@ -11,6 +12,18 @@ const PLANS = {
   plink_1UNIxrGoXXmRNVk9C0LarrwZ: { plan: "Growth", price_cents: 149700, billing: "monthly", videos_per_month: 12, sessions_per_month: 2, platforms: "Instagram, Facebook, TikTok" },
   plink_1UNIyaGoXXmRNVk9ONs89d56: { plan: "Premium", price_cents: 249700, billing: "monthly", videos_per_month: 20, sessions_per_month: 4, platforms: "Instagram, Facebook, TikTok, YouTube Shorts" },
   plink_1UNIzRGoXXmRNVk9sbneHq7u: { plan: "Growth Plan", price_cents: 49700, billing: "one-time", videos_per_month: 0, sessions_per_month: 0, platforms: "Audit + 90-day plan + strategy call" },
+};
+
+// The Rare Society. Its payment links are recognised by id here, or by payment-link metadata
+// rf_product=society and rf_plan=membership|course.
+const SOCIETY = {
+  // plink_...: "membership",
+  // plink_...: "course",
+};
+const societyKind = (s) => {
+  const m = s.metadata || {};
+  if (m.rf_product === "society") return m.rf_plan === "course" ? "course" : "membership";
+  return SOCIETY[s.payment_link];
 };
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -93,15 +106,8 @@ async function sendEmail(env, to, subject, html) {
   if (!res.ok) console.error("email failed", res.status, await res.text());
 }
 
-async function checkoutCompleted(s, sb, env) {
-  const preset = PLANS[s.payment_link];
-  if (!preset) return { ignored: "not a Rare Feature payment link" };
-  if (s.payment_status && s.payment_status === "unpaid") return { ignored: "unpaid" };
-  const email = (s.customer_details?.email || s.customer_email || "").trim().toLowerCase();
-  if (!email) throw new Error("checkout session has no customer email");
-  const name = s.customer_details?.name || null;
-
-  // Find or create the client's login.
+// Find or create the buyer's login (one login works on rarefeature.com and the Society).
+async function ensureProfile(sb, email, name) {
   let { data: profile, error } = await sb.from("profiles").select("id, full_name").eq("email", email).maybeSingle();
   if (error) throw error;
   if (!profile) {
@@ -116,6 +122,68 @@ async function checkoutCompleted(s, sb, env) {
     const upd = await sb.from("profiles").update({ full_name: name }).eq("id", profile.id);
     if (upd.error) throw upd.error;
   }
+  return profile;
+}
+
+async function societyCheckout(s, kind, sb, env) {
+  if (s.payment_status && s.payment_status === "unpaid") return { ignored: "unpaid" };
+  const email = (s.customer_details?.email || s.customer_email || "").trim().toLowerCase();
+  if (!email) throw new Error("checkout session has no customer email");
+  const name = s.customer_details?.name || null;
+  const profile = await ensureProfile(sb, email, name);
+
+  const existing = await sb.from("society_members").select("id, name, stripe_session_id").eq("email", email).maybeSingle();
+  if (existing.error) throw existing.error;
+  if (s.id && existing.data?.stripe_session_id === s.id) return { already_provisioned: email };
+  const row = {
+    email, user_id: profile.id, name: existing.data?.name || name,
+    stripe_session_id: s.id ?? null,
+    updated_at: new Date().toISOString(),
+  };
+  if (typeof s.customer === "string") row.stripe_customer_id = s.customer;
+  if (kind === "course") row.course_owned = true;
+  else Object.assign(row, {
+    membership_status: "active",
+    price_cents: Number.isFinite(s.amount_total) ? s.amount_total : null,
+    stripe_subscription_id: typeof s.subscription === "string" ? s.subscription : null,
+  });
+  const saved = await sb.from("society_members").upsert(row, { onConflict: "email" });
+  if (saved.error) throw saved.error;
+
+  const what = kind === "course" ? "The Rare Society course" : "The Rare Society membership";
+  const price = Number.isFinite(s.amount_total) ? `${money(s.amount_total)}${kind === "course" ? " one-time" : "/mo"}` : null;
+  await sendEmail(env, email, kind === "course" ? "Your Rare Society course is ready" : "Welcome to The Rare Society", layout({
+    preheader: "Your access is ready. Sign in with this email to start.",
+    label: "The Rare Society",
+    heading: `You’re in${name ? `, ${esc(name.split(" ")[0])}` : ""}.`,
+    body: p(kind === "course"
+      ? "Thank you for buying the course. Every lesson is unlocked and it’s yours to keep."
+      : "Welcome to The Rare Society. The full course, the monthly live Q&amp;A, and the community are all unlocked.") +
+      rows([["Access", what], ["Price", price], ["Sign-in email", email]]),
+    cta: { text: "Start the course", url: `${SOCIETY_SITE}/login` },
+    note: small("No password needed. Enter this email and we’ll send you a one-time sign-in link."),
+  }));
+  await sendEmail(env, env.owner, `New Rare Society ${kind === "course" ? "course sale" : "member"}: ${name || email}`, layout({
+    preheader: `${esc(name || email)} bought ${what}.`,
+    label: "The Rare Society",
+    heading: `${esc(name || email)} joined`,
+    body: rows([["Name", name], ["Email", email], ["Bought", what], ["Price", price]]) + p("Their access was unlocked automatically."),
+    cta: { text: "Open Society admin", url: `${SOCIETY_SITE}/admin` },
+  }));
+  return { society: email, kind };
+}
+
+async function checkoutCompleted(s, sb, env) {
+  const kind = societyKind(s);
+  if (kind) return societyCheckout(s, kind, sb, env);
+  const preset = PLANS[s.payment_link];
+  if (!preset) return { ignored: "not a Rare Feature payment link" };
+  if (s.payment_status && s.payment_status === "unpaid") return { ignored: "unpaid" };
+  const email = (s.customer_details?.email || s.customer_email || "").trim().toLowerCase();
+  if (!email) throw new Error("checkout session has no customer email");
+  const name = s.customer_details?.name || null;
+
+  const profile = await ensureProfile(sb, email, name);
 
   // Assign the plan. A one-time Growth Plan never replaces a running monthly package.
   const current = await sb.from("client_plans").select("plan, billing, status, stripe_session_id").eq("client_id", profile.id).maybeSingle();
@@ -166,6 +234,11 @@ async function invoicePaid(inv, sb) {
   if (typeof sub !== "string" || !end) return { ignored: "no subscription on invoice" };
   const upd = await sb.from("client_plans").update({ next_billing_on: day(new Date(end * 1000)), updated_at: new Date().toISOString() }).eq("stripe_subscription_id", sub);
   if (upd.error) throw upd.error;
+  const soc = await sb.from("society_members").update({ current_period_end: new Date(end * 1000).toISOString(), updated_at: new Date().toISOString() }).eq("stripe_subscription_id", sub);
+  if (soc.error) throw soc.error;
+  // A late payment that finally went through restores normal status.
+  const back = await sb.from("society_members").update({ membership_status: "active" }).eq("stripe_subscription_id", sub).eq("membership_status", "past_due");
+  if (back.error) throw back.error;
   return { billing_date_updated: sub };
 }
 
@@ -177,6 +250,14 @@ async function subscriptionDeleted(sub, sb, env) {
     heading: `A ${esc(upd.data[0].plan)} subscription was cancelled`,
     body: p("It was cancelled in Stripe, and the client’s portal now shows the plan as cancelled."),
     cta: { text: "Open admin", url: `${SITE}/admin.html` },
+  }));
+  const soc = await sb.from("society_members").update({ membership_status: "cancelled", updated_at: new Date().toISOString() }).eq("stripe_subscription_id", sub.id).select("email, name");
+  if (soc.error) throw soc.error;
+  if (soc.data?.length) await sendEmail(env, env.owner, `Rare Society membership ended: ${soc.data[0].name || soc.data[0].email}`, layout({
+    label: "The Rare Society",
+    heading: "A membership ended",
+    body: rows([["Member", soc.data[0].name], ["Email", soc.data[0].email]]) + p("The subscription ended in Stripe, so their Society access was turned off. If they also bought the course outright, they keep the course."),
+    cta: { text: "Open Society admin", url: `${SOCIETY_SITE}/admin` },
   }));
   return { cancelled: sub.id };
 }
@@ -194,6 +275,11 @@ export async function handle(req, sb, env) {
     else if (event.type === "invoice.paid") result = await invoicePaid(o, sb);
     else if (event.type === "customer.subscription.deleted") result = await subscriptionDeleted(o, sb, env);
     else if (event.type === "invoice.payment_failed") {
+      const sub = o.subscription ?? o.parent?.subscription_details?.subscription;
+      if (typeof sub === "string") {
+        const late = await sb.from("society_members").update({ membership_status: "past_due", updated_at: new Date().toISOString() }).eq("stripe_subscription_id", sub).eq("membership_status", "active");
+        if (late.error) throw late.error;
+      }
       await sendEmail(env, env.owner, "A client payment failed", layout({
         label: "Payment failed",
         heading: "A client payment didn’t go through",

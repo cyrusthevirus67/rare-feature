@@ -308,3 +308,144 @@ grant execute on function public.sign_agreement(uuid, text, boolean, text) to an
 
 -- To make another person an admin later:
 --   update public.profiles set is_admin = true where email = 'someone@example.com';
+
+-- The Rare Society (society.rarefeature.com): a $49/mo membership and a one-time course.
+-- Stripe purchases add people here (supabase/functions/stripe-webhook); lessons are added in society admin.
+create table if not exists public.society_modules (
+  id uuid primary key default gen_random_uuid(),
+  position integer not null default 0,
+  title text not null,
+  summary text,
+  published boolean not null default true,
+  created_at timestamptz not null default now()
+);
+create table if not exists public.society_lessons (
+  id uuid primary key default gen_random_uuid(),
+  module_id uuid not null references public.society_modules on delete cascade,
+  position integer not null default 0,
+  title text not null,
+  body text,                              -- lesson notes, shown under the video
+  video_url text,                         -- YouTube, Vimeo, Loom, or a direct .mp4 link
+  resource_url text,                      -- optional download / worksheet link
+  duration_min integer,
+  published boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create table if not exists public.society_members (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique check (email = lower(email)),
+  user_id uuid references public.profiles on delete set null,
+  name text,
+  course_owned boolean not null default false,       -- bought the course outright: keeps the course for good
+  membership_status text not null default 'none',    -- none | active | past_due | cancel_requested | cancelled
+  price_cents integer,                               -- membership price they joined at
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  stripe_session_id text,
+  current_period_end timestamptz,
+  note text,
+  joined_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create table if not exists public.society_progress (
+  user_id uuid not null references public.profiles on delete cascade,
+  lesson_id uuid not null references public.society_lessons on delete cascade,
+  completed_at timestamptz not null default now(),
+  primary key (user_id, lesson_id)
+);
+create table if not exists public.society_settings (
+  key text primary key,                   -- qa_next_at | qa_link | qa_note | community_link | community_name | welcome_note
+  value text,
+  updated_at timestamptz not null default now()
+);
+
+create or replace function public.society_my_email() returns text
+language sql stable as $$ select lower(coalesce(auth.jwt() ->> 'email', '')) $$;
+
+create or replace function public.society_has_course() returns boolean
+language sql stable security definer set search_path = public as $$
+  select public.is_admin() or exists (
+    select 1 from public.society_members m
+    where (m.user_id = auth.uid() or m.email = public.society_my_email())
+      and (m.course_owned or m.membership_status in ('active', 'past_due', 'cancel_requested')));
+$$;
+
+create or replace function public.society_has_community() returns boolean
+language sql stable security definer set search_path = public as $$
+  select public.is_admin() or exists (
+    select 1 from public.society_members m
+    where (m.user_id = auth.uid() or m.email = public.society_my_email())
+      and m.membership_status in ('active', 'past_due', 'cancel_requested'));
+$$;
+
+-- Who am I in the Society? Links the membership to the login the first time they sign in.
+create or replace function public.society_me() returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare m public.society_members;
+begin
+  if auth.uid() is null then return null; end if;
+  update public.society_members set user_id = auth.uid(), updated_at = now()
+    where user_id is null and email = public.society_my_email();
+  select * into m from public.society_members where user_id = auth.uid() or email = public.society_my_email() limit 1;
+  return jsonb_build_object(
+    'email', public.society_my_email(),
+    'admin', public.is_admin(),
+    'course', public.society_has_course(),
+    'community', public.society_has_community(),
+    'member', case when m.id is null then null else to_jsonb(m) - 'stripe_session_id' - 'note' end);
+end;
+$$;
+
+-- Public course outline for the sales page: titles only, never videos or notes.
+create or replace function public.society_outline() returns jsonb
+language sql stable security definer set search_path = public as $$
+  select coalesce(jsonb_agg(jsonb_build_object(
+    'title', m.title, 'summary', m.summary,
+    'lessons', (select coalesce(jsonb_agg(jsonb_build_object('title', l.title, 'duration_min', l.duration_min) order by l.position, l.created_at), '[]'::jsonb)
+                from public.society_lessons l where l.module_id = m.id and l.published))
+    order by m.position, m.created_at), '[]'::jsonb)
+  from public.society_modules m where m.published;
+$$;
+grant execute on function public.society_outline() to anon, authenticated;
+
+-- A member asks to cancel; the owner is emailed (through requests) and cancels it in Stripe.
+create or replace function public.society_request_cancel(p_message text) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  update public.society_members set membership_status = 'cancel_requested', updated_at = now()
+    where (user_id = auth.uid() or email = public.society_my_email()) and membership_status in ('active', 'past_due');
+  if not found then raise exception 'No active membership to cancel.'; end if;
+  insert into public.requests (client_id, kind, message)
+    values (auth.uid(), 'cancellation', 'The Rare Society membership: ' || coalesce(nullif(trim(p_message), ''), 'No reason given.'));
+end;
+$$;
+
+alter table public.society_modules enable row level security;
+alter table public.society_lessons enable row level security;
+alter table public.society_members enable row level security;
+alter table public.society_progress enable row level security;
+alter table public.society_settings enable row level security;
+
+drop policy if exists "read published modules" on public.society_modules;
+create policy "read published modules" on public.society_modules for select using (published or public.is_admin());
+drop policy if exists "members read lessons" on public.society_lessons;
+create policy "members read lessons" on public.society_lessons for select using ((published and public.society_has_course()) or public.is_admin());
+drop policy if exists "own membership" on public.society_members;
+create policy "own membership" on public.society_members for select using (user_id = auth.uid() or email = public.society_my_email() or public.is_admin());
+drop policy if exists "members read settings" on public.society_settings;
+create policy "members read settings" on public.society_settings for select using (public.society_has_community() or public.is_admin());
+drop policy if exists "own progress" on public.society_progress;
+create policy "own progress" on public.society_progress for select using (user_id = auth.uid() or public.is_admin());
+drop policy if exists "mark own progress" on public.society_progress;
+create policy "mark own progress" on public.society_progress for insert with check (user_id = auth.uid() and public.society_has_course());
+drop policy if exists "unmark own progress" on public.society_progress;
+create policy "unmark own progress" on public.society_progress for delete using (user_id = auth.uid());
+
+do $$
+declare t text;
+begin
+  foreach t in array array['society_modules', 'society_lessons', 'society_members', 'society_settings'] loop
+    execute format('drop policy if exists "admin manages" on public.%I', t);
+    execute format('create policy "admin manages" on public.%I for all using (public.is_admin()) with check (public.is_admin())', t);
+  end loop;
+end $$;
