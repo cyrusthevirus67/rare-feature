@@ -17,8 +17,8 @@ const PLANS = {
 // The Rare Society. Its payment links are recognised by id here, or by payment-link metadata
 // rf_product=society and rf_plan=membership|course.
 const SOCIETY = {
-  // plink_...: "membership",
-  // plink_...: "course",
+  plink_1UYXLDGoXXmRNVk9YOq5PgEd: "membership", // $49/mo
+  plink_1UYXMBGoXXmRNVk9PmamSXdX: "course",     // $297 one-time
 };
 const societyKind = (s) => {
   const m = s.metadata || {};
