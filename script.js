@@ -32,8 +32,8 @@ const INTEREST = {
 const interest = document.getElementById("interest");
 // Without a checkout link, the button keeps its /contact?plan=… link and the form is pre-filled there.
 document.querySelectorAll("[data-plan]").forEach((el) => {
-  const link = CONFIG.checkout[el.dataset.plan];
-  if (link) el.href = link;
+  // Purchasable plans open the on-site checkout page.
+  if (CONFIG.checkout[el.dataset.plan]) el.href = `/checkout?plan=${el.dataset.plan}`;
 });
 const wanted = new URLSearchParams(location.search).get("plan");
 if (interest && INTEREST[wanted]) interest.value = INTEREST[wanted];

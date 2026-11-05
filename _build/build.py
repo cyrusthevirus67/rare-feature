@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = Path(__file__).resolve().parent / "pages"
 SITE = "https://rarefeature.com"
-V = {"css": 18, "js": 11, "config": 13, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
+V = {"css": 18, "js": 12, "config": 14, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
 
 ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>'
 
@@ -55,6 +55,11 @@ SITE_PAGES = {
         title="FAQ — Rare Feature",
         desc="Answers to common questions about working with Rare Feature: getting started, content, contracts, billing and cancellation.",
         path="/faq", active="faq", cta=True, next=("Get in touch", "/contact"),
+    ),
+    "checkout": dict(
+        title="Checkout — Rare Feature",
+        desc="Secure checkout for Rare Feature packages.",
+        path="/checkout", solid=True, robots="noindex", scripts=["stripe", "checkout"],
     ),
     "book": dict(
         title="Book a call — Rare Feature",
@@ -236,6 +241,10 @@ def scripts(p):
     if "core" in p.get("scripts", []):
         s.append(f'<script src="/portal-core.js?v={V["core"]}"></script>')
     s.append(f'<script src="/script.js?v={V["js"]}"></script>')
+    if "stripe" in p.get("scripts", []):
+        s.append('<script src="https://js.stripe.com/v3/"></script>')
+    if "checkout" in p.get("scripts", []):
+        s.append('<script src="/checkout.js?v=1"></script>')
     return "\n" + "".join(f"  {x}\n" for x in s) + "</body>\n</html>\n"
 
 

@@ -14,6 +14,14 @@ const PLANS = {
   plink_1UNIzRGoXXmRNVk9sbneHq7u: { plan: "Growth Plan", price_cents: 49700, billing: "one-time", videos_per_month: 0, sessions_per_month: 0, platforms: "Audit + 90-day plan + strategy call" },
 };
 
+// Purchases from the on-site checkout pages carry metadata rf_plan instead of a payment link.
+const PLAN_KEYS = {
+  starter: PLANS.plink_1UNIwRGoXXmRNVk9WF0KYX6s,
+  growth: PLANS.plink_1UNIxrGoXXmRNVk9C0LarrwZ,
+  premium: PLANS.plink_1UNIyaGoXXmRNVk9ONs89d56,
+  "growth-plan": PLANS.plink_1UNIzRGoXXmRNVk9sbneHq7u,
+};
+
 // The Rare Society. Its payment links are recognised by id here, or by payment-link metadata
 // rf_product=society and rf_plan=membership|course.
 const SOCIETY = {
@@ -176,7 +184,7 @@ async function societyCheckout(s, kind, sb, env) {
 async function checkoutCompleted(s, sb, env) {
   const kind = societyKind(s);
   if (kind) return societyCheckout(s, kind, sb, env);
-  const preset = PLANS[s.payment_link];
+  const preset = PLANS[s.payment_link] || PLAN_KEYS[s.metadata?.rf_plan];
   if (!preset) return { ignored: "not a Rare Feature payment link" };
   if (s.payment_status && s.payment_status === "unpaid") return { ignored: "unpaid" };
   const email = (s.customer_details?.email || s.customer_email || "").trim().toLowerCase();

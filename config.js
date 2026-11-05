@@ -22,5 +22,7 @@ window.RF_CONFIG = {
   calendly: { call: "https://calendly.com/cyrus-rareft/30min", filming: "https://calendly.com/cyrus-rareft/30min" },
   // Optional form service URL (e.g. Formspree) so requests arrive without opening an email app.
   formEndpoint: "",
+  // Stripe publishable key (public by design) for the on-site checkout page.
+  stripeKey: "pk_live_51UNIjPGoXXmRNVk9rpMcwSsIEkxZVfyfrawloU4Iom2WYeZDaWUuG3PxJP1uM4uhvZKYmT9LVDsyaXWZw2hT2lYo00AobB86gs",
   email: "cyrus@rareft.com",
 };
