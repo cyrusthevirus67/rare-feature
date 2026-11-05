@@ -591,3 +591,21 @@ p { margin: 0 0 1em; }
 .contact--page .display--xl { font-size: clamp(3.4rem, 7.4vw, 7.4rem); }
 .nav__toggle { flex: none; }
 @media (max-width: 360px) { .nav__inner { gap: 16px; } .brand img { height: 22px; } }
+
+/* ===== The Rare Society on the main site ===== */
+.hero__new { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 22px; font-size: .8rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.85); }
+.hero__new span { padding: 5px 10px; border-radius: 999px; background: var(--red); color: #fff; letter-spacing: .12em; }
+.hero__buy { display: grid; gap: 14px; justify-items: start; }
+.hero__note { margin: 0; font-size: .9rem; color: rgba(255,255,255,.7); }
+.hero__note a { color: #fff; text-decoration-color: var(--red); text-underline-offset: 3px; }
+.intro__head { margin-bottom: clamp(56px, 7vw, 96px); }
+.intro__head .display { max-width: 12ch; }
+.intro__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.nav__society { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-size: .92rem; font-weight: 600; color: #fff; white-space: nowrap; }
+.nav__society span, .mobile-menu__society span { font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; background: var(--red); color: #fff; }
+.nav__society:hover { color: var(--red); }
+.mobile-menu a.mobile-menu__society { display: flex; align-items: center; justify-content: space-between; color: var(--red); }
+.mobile-menu__society span { font-family: var(--sans); }
+@media (max-width: 1240px) and (min-width: 1101px) { .nav__links { gap: 20px; } .nav__inner { gap: 22px; } }
+@media (max-width: 1100px) { .nav__society { display: none; } }
+@media (max-width: 600px) { .hero__buy { width: 100%; } }

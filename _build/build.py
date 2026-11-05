@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = Path(__file__).resolve().parent / "pages"
 SITE = "https://rarefeature.com"
-V = {"css": 16, "js": 11, "config": 13, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
+V = {"css": 18, "js": 11, "config": 13, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
 
 ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>'
 
@@ -149,6 +149,7 @@ def header(p):
       <a href="/" class="brand" aria-label="Rare Feature home"><img src="/assets/logo-lockup.png?v={V["logo"]}" alt="Rare Feature" width="718" height="96"></a>
       <nav class="nav__links" aria-label="Primary">{links}
       </nav>
+      <a href="https://society.rarefeature.com" class="nav__society">The Society <span>New</span></a>
       <a href="/client" class="nav__login"{cur("client")}>Client login</a>
       <a href="/book" class="btn btn--red btn--sm nav__cta"{cur("book")}>Book a call</a>
       <button class="nav__toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -156,6 +157,7 @@ def header(p):
       </button>
     </div>
     <div class="mobile-menu" id="mobile-menu" hidden>{mlinks}
+      <a href="https://society.rarefeature.com" class="mobile-menu__society">The Rare Society <span>New</span></a>
       <a href="/client">Client login</a>
       <a href="/book" class="btn btn--red">Book a call</a>
       <a href="/contact?plan=audit" class="btn btn--line">Get a free audit</a>
@@ -208,6 +210,7 @@ def footer():
           <a href="/contact?plan=audit">Get a free audit</a>
           <a href="/book">Book a call</a>
           <a href="/contact">Contact</a>
+          <a href="https://society.rarefeature.com">The Rare Society</a>
           <a href="/client">Client login</a>
           <a href="mailto:cyrus@rareft.com">cyrus@rareft.com</a>
         </div>
