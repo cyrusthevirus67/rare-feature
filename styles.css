@@ -638,3 +638,5 @@ p { margin: 0 0 1em; }
 .co__fine { margin: 16px 4px 0; font-size: .82rem; color: var(--muted); }
 .co__fine a { color: #fff; }
 @media (max-width: 900px) { .co__grid { grid-template-columns: 1fr; } .co__sum { position: static; } }
+
+.co__back { display: table; }
