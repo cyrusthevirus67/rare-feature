@@ -707,3 +707,4 @@ body::after { content: ""; position: fixed; inset: 0; z-index: 300; pointer-even
 .tier:hover { box-shadow: 0 30px 60px -30px rgba(255,59,47,.35); }
 .hero__title { font-size: clamp(4rem, min(13.5vw, 20vh), 13rem); }
 .hero__buy { flex: 0 1 540px; } .hero__wait { width: 100%; }
+@media (max-width: 600px) { .hero__wait input { flex: none; height: 50px; } }
