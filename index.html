@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://images.unsplash.com">
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=19">
+  <link rel="stylesheet" href="/styles.css?v=20">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"Rare Feature","url":"https://rarefeature.com/","logo":"https://rarefeature.com/assets/favicon.png","email":"cyrus@rareft.com","description":"Social media growth and consulting for businesses and content creators."}
   </script>
@@ -48,7 +48,7 @@
         <a href="/faq">FAQ</a>
         <a href="/contact">Contact</a>
       </nav>
-      <a href="https://society.rarefeature.com" class="nav__society">The Society <span>New</span></a>
+      <a href="https://society.rarefeature.com" class="nav__society">The Society <span>Soon</span></a>
       <a href="/client" class="nav__login">Client login</a>
       <a href="/book" class="btn btn--red btn--sm nav__cta">Book a call</a>
       <button class="nav__toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -62,7 +62,7 @@
       <a href="/pricing">Pricing</a>
       <a href="/faq">FAQ</a>
       <a href="/contact">Contact</a>
-      <a href="https://society.rarefeature.com" class="mobile-menu__society">The Rare Society <span>New</span></a>
+      <a href="https://society.rarefeature.com" class="mobile-menu__society">The Rare Society <span>Soon</span></a>
       <a href="/client">Client login</a>
       <a href="/book" class="btn btn--red">Book a call</a>
       <a href="/contact?plan=audit" class="btn btn--line">Get a free audit</a>
@@ -77,20 +77,23 @@
       </div>
       <div class="hero__rec" aria-hidden="true"><span class="rec-dot"></span>REC <span class="hero__tc" id="timecode">00:00:00:00</span></div>
       <div class="wrap hero__inner">
-        <p class="hero__new"><span>New</span> From Rare Feature · Course + live Q&amp;A + community</p>
+        <p class="hero__new"><span>Coming soon</span> From Rare Feature · Course + live Q&amp;A + community</p>
         <h1 class="hero__title">
           <span class="line"><span>The Rare</span></span>
           <span class="line"><span><em>Society</em></span></span>
-          <span class="line"><span>is open.</span></span>
+          <span class="line"><span>is coming.</span></span>
         </h1>
         <div class="hero__foot">
-          <p class="hero__lede">Learn the exact system we use to grow accounts for businesses and creators — a step-by-step course, a live Q&amp;A every month, and a private community that keeps you posting.</p>
+          <p class="hero__lede">The system we use to grow accounts for businesses and creators — a step-by-step course, a live Q&amp;A every month, and a private community. Join the waitlist to get in first, at the founding price.</p>
           <div class="hero__buy">
-            <div class="hero__actions">
-              <a href="https://society.rarefeature.com" class="btn btn--red">Join for $49/mo <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
-              <a href="https://society.rarefeature.com/#curriculum" class="btn btn--glass">See what’s inside</a>
-            </div>
-            <p class="hero__note">Cancel anytime · Instant access · <a href="#intro">Want it done for you? ↓</a></p>
+            <form class="hero__wait" id="hero-wait" novalidate>
+              <label class="sr-only" for="hw-name">First name</label>
+              <input id="hw-name" name="name" type="text" placeholder="First name" autocomplete="given-name" required maxlength="200">
+              <label class="sr-only" for="hw-email">Email</label>
+              <input id="hw-email" name="email" type="email" placeholder="Email address" autocomplete="email" required maxlength="320">
+              <button type="submit" class="btn btn--red">Join the waitlist <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+            </form>
+            <p class="hero__note" id="hero-wait-msg" role="status" aria-live="polite">Founding price for the list · No spam · <a href="https://society.rarefeature.com">Preview what’s inside</a></p>
           </div>
         </div>
       </div>
@@ -124,6 +127,12 @@
       <div class="wrap platforms reveal">
         <span>We grow accounts on</span>
         <ul><li>Instagram</li><li>TikTok</li><li>YouTube</li><li>Facebook</li><li>LinkedIn</li><li>X</li></ul>
+      </div>
+      <div class="wrap nums">
+        <div class="num reveal"><b>8–20</b><span>short videos made for you every month</span></div>
+        <div class="num reveal"><b>90<small>-day</small></b><span>content plan built around your audience</span></div>
+        <div class="num reveal"><b>6</b><span>platforms we know inside and out</span></div>
+        <div class="num reveal"><b>$0</b><span>to start — your audit is free</span></div>
       </div>
     </section>
 
@@ -203,6 +212,50 @@
               </ul>
               <a href="/who-we-help#creators" class="btn btn--red btn--sm">How we help creators</a>
             </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY US -->
+    <section class="section section--top0">
+      <div class="wrap">
+        <div class="head head--row">
+          <div>
+            <p class="label">Why Rare Feature</p>
+            <h2 class="display">Built to be<br><em>watched.</em></h2>
+          </div>
+          <p class="head__sub">Most content gets skipped in two seconds. Everything we make is designed to earn the next second — and the follow, the call, the sale.</p>
+        </div>
+        <div class="bento">
+          <article class="bento__card bento__card--photo reveal">
+            <img src="https://images.unsplash.com/photo-1632187981988-40f3cbaeef5e?auto=format&fit=crop&w=1100&h=1200&q=70" alt="" loading="lazy">
+            <div class="bento__body">
+              <span class="bento__k">01 · Filming</span>
+              <h3>You show up. We handle the rest.</h3>
+              <p>Monthly filming sessions with a shot list ready to go — no blank-page panic, no guessing what to say.</p>
+            </div>
+          </article>
+          <article class="bento__card reveal">
+            <span class="bento__k">02 · Hooks first</span>
+            <h3>The first two seconds decide everything.</h3>
+            <p>Every video is built around the opening, because that’s where people choose to stay or scroll.</p>
+          </article>
+          <article class="bento__card bento__card--red reveal">
+            <span class="bento__k">03 · One team</span>
+            <h3>Strategy to posting, start to finish.</h3>
+            <p>Planning, filming, editing, captions and scheduling — handled by the people who know your brand.</p>
+          </article>
+          <article class="bento__card reveal">
+            <span class="bento__k">04 · Reporting</span>
+            <h3>Reports in plain English.</h3>
+            <p>What worked, what didn’t, and what we’re doing next — every month.</p>
+          </article>
+          <article class="bento__card reveal">
+            <span class="bento__k">05 · Client portal</span>
+            <h3>Everything in one place.</h3>
+            <p>Sign your agreement, see your plan and manage billing from your own portal.</p>
+            <a href="/client" class="bento__link">Client login →</a>
           </article>
         </div>
       </div>
@@ -326,6 +379,6 @@
   </footer>
 
   <script src="/config.js?v=14"></script>
-  <script src="/script.js?v=12"></script>
+  <script src="/script.js?v=13"></script>
 </body>
 </html>

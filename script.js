@@ -195,3 +195,47 @@ if (form) {
     }
   });
 }
+
+// Homepage: The Rare Society waitlist (saved as a lead, so it shows under Leads in the admin page).
+{
+  const form = document.getElementById("hero-wait");
+  const msg = document.getElementById("hero-wait-msg");
+  if (form && msg) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = form.elements.name, email = form.elements.email;
+      let ok = true;
+      [name, email].forEach((f) => { const good = f.value.trim() && f.checkValidity(); f.classList.toggle("is-invalid", !good); if (!good) ok = false; });
+      msg.className = "hero__note";
+      if (!ok) { msg.textContent = "Add your first name and a valid email."; msg.classList.add("is-error"); return; }
+      const sb = CONFIG.supabase || {};
+      const btn = form.querySelector("button");
+      btn.disabled = true;
+      msg.textContent = "Saving your spot…";
+      try {
+        if (!sb.url || !sb.anonKey) throw new Error("not configured");
+        const res = await fetch(`${sb.url}/rest/v1/leads`, {
+          method: "POST",
+          headers: { apikey: sb.anonKey, Authorization: `Bearer ${sb.anonKey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+          body: JSON.stringify({ name: name.value.trim(), email: email.value.trim(), interest: "The Rare Society", message: "Waitlist — homepage" }),
+        });
+        if (!res.ok) throw new Error();
+        form.reset();
+        msg.textContent = "You’re on the list. We’ll email you the moment doors open.";
+        msg.classList.add("is-ok");
+      } catch {
+        msg.textContent = `Something went wrong. Email ${CONFIG.email} and we’ll add you.`;
+        msg.classList.add("is-error");
+      } finally { btn.disabled = false; }
+    });
+  }
+}
+
+// Cursor glow on the "Why Rare Feature" cards.
+document.querySelectorAll(".bento__card").forEach((card) => {
+  card.addEventListener("pointermove", (e) => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    card.style.setProperty("--my", `${e.clientY - r.top}px`);
+  });
+});
