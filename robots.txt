@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin
+Disallow: /portal
+Disallow: /sign
+Disallow: /checkout
+Disallow: /welcome
+Sitemap: https://rarefeature.com/sitemap.xml

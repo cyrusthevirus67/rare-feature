@@ -11,16 +11,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = Path(__file__).resolve().parent / "pages"
 SITE = "https://rarefeature.com"
-V = {"css": 21, "js": 13, "config": 14, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
+V = {"css": 22, "js": 14, "config": 14, "calendly": 1, "portal_css": 5, "core": 3, "logo": 3, "icon": 4}
 
 ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>'
 
 NAV = [
     ("services", "/services", "Services"),
     ("who", "/who-we-help", "Who we help"),
-    ("process", "/process", "Process"),
     ("pricing", "/pricing", "Pricing"),
-    ("faq", "/faq", "FAQ"),
+    ("coaching", "/coaching", "Coaching"),
+    ("resources", "/resources", "Resources"),
     ("contact", "/contact", "Contact"),
 ]
 
@@ -60,6 +60,36 @@ SITE_PAGES = {
         title="Checkout — Rare Feature",
         desc="Secure checkout for Rare Feature packages.",
         path="/checkout", solid=True, robots="noindex", scripts=["stripe", "checkout"],
+    ),
+    "coaching": dict(
+        title="1:1 Coaching — Rare Feature",
+        desc="Run your own social media with an expert in your corner: a $197 strategy session or 1:1 coaching from $397/month.",
+        path="/coaching", active="coaching", cta=True, next=("Free resources", "/resources"),
+    ),
+    "guide": dict(
+        title="Free guide: The Stop-the-Scroll Playbook — Rare Feature",
+        desc="Free: 25 fill-in-the-blank hooks, a 30-day posting plan, a phone filming checklist and a caption formula for short-form video.",
+        path="/guide", solid=True, scripts=["guide"],
+    ),
+    "resources": dict(
+        title="Resources — Rare Feature",
+        desc="Free, practical advice on growing with social media: hooks, posting schedules, and turning followers into customers.",
+        path="/resources", active="resources", cta=True,
+    ),
+    "resources/how-to-write-a-hook": dict(
+        title="How to write a hook that stops the scroll — Rare Feature",
+        desc="You have about two seconds. How to write short-form video hooks that make people stay, with five formulas that work.",
+        path="/resources/how-to-write-a-hook", active="resources", solid=True, article=True,
+    ),
+    "resources/how-often-to-post": dict(
+        title="How often should a business post on social media? — Rare Feature",
+        desc="The honest answer to how often a business should post on Instagram, TikTok and YouTube Shorts, and a schedule you can keep.",
+        path="/resources/how-often-to-post", active="resources", solid=True, article=True,
+    ),
+    "resources/followers-to-customers": dict(
+        title="How to turn followers into customers — Rare Feature",
+        desc="The four steps from a view to a sale, and how to make content for each one so your followers actually buy.",
+        path="/resources/followers-to-customers", active="resources", solid=True, article=True,
     ),
     "book": dict(
         title="Book a call — Rare Feature",
@@ -166,6 +196,8 @@ def header(p):
       <a href="/client">Client login</a>
       <a href="/book" class="btn btn--red">Book a call</a>
       <a href="/contact?plan=audit" class="btn btn--line">Get a free audit</a>
+      <a href="/process">Process</a>
+      <a href="/faq">FAQ</a>
     </div>
   </header>
 """
@@ -208,10 +240,11 @@ def footer():
         <div class="footer__brand"><img src="/assets/logo-full.png?v={V["logo"]}" alt="Rare Feature" width="749" height="449" loading="lazy"><p>Social media growth &amp; consulting<br>for businesses and creators.</p></div>
         <nav aria-label="Footer">
           <p class="footer__k">Explore</p>
-          <a href="/">Home</a><a href="/services">Services</a><a href="/who-we-help">Who we help</a><a href="/process">Process</a><a href="/pricing">Pricing</a><a href="/faq">FAQ</a>
+          <a href="/">Home</a><a href="/services">Services</a><a href="/who-we-help">Who we help</a><a href="/process">Process</a><a href="/pricing">Pricing</a><a href="/coaching">Coaching</a><a href="/resources">Resources</a><a href="/faq">FAQ</a>
         </nav>
         <div>
           <p class="footer__k">Get started</p>
+          <a href="/guide">Free guide</a>
           <a href="/contact?plan=audit">Get a free audit</a>
           <a href="/book">Book a call</a>
           <a href="/contact">Contact</a>
@@ -243,6 +276,8 @@ def scripts(p):
     s.append(f'<script src="/script.js?v={V["js"]}"></script>')
     if "stripe" in p.get("scripts", []):
         s.append('<script src="https://js.stripe.com/v3/"></script>')
+    if "guide" in p.get("scripts", []):
+        s.append('<script src="/guide.js?v=1"></script>')
     if "checkout" in p.get("scripts", []):
         s.append('<script src="/checkout.js?v=1"></script>')
     return "\n" + "".join(f"  {x}\n" for x in s) + "</body>\n</html>\n"
@@ -259,8 +294,15 @@ def build():
         if p.get("cta"):
             out += cta()
         out += "  </main>\n" + footer() + scripts(p)
-        (ROOT / f"{name}.html").write_text(out)
+        dest = ROOT / f"{name}.html"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(out)
         print("built", f"{name}.html")
+    urls = [p["path"] for p in SITE_PAGES.values() if not p.get("robots") and p["path"] not in ("/client",)] + ["/links"]
+    sm = "".join(f"  <url><loc>{SITE}{u}</loc></url>\n" for u in urls)
+    (ROOT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{sm}</urlset>\n')
+    (ROOT / "robots.txt").write_text(f"User-agent: *\nDisallow: /admin\nDisallow: /portal\nDisallow: /sign\nDisallow: /checkout\nDisallow: /welcome\nSitemap: {SITE}/sitemap.xml\n")
+    print("built sitemap.xml, robots.txt")
 
 
 if __name__ == "__main__":

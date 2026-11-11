@@ -28,6 +28,8 @@ const INTEREST = {
   starter: "Starter ($997/mo)",
   growth: "Growth ($1,497/mo)",
   premium: "Premium ($2,497/mo)",
+  strategy: "Strategy Session ($197)",
+  coaching: "1:1 Coaching ($397/mo)",
 };
 const interest = document.getElementById("interest");
 // Without a checkout link, the button keeps its /contact?plan=… link and the form is pre-filled there.
